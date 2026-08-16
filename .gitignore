@@ -1,0 +1,30 @@
+# --- Python Ön Bellek Dosyaları ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- Sanal Ortam (Virtual Environment) ---
+# Burası çok önemli! Tüm kütüphanelerin git'e yüklenmesini engeller
+.venv/
+venv/
+env/
+
+# --- PyCharm / IDE Dosyaları ---
+# PyCharm'ın kendi ayar klasörü
+.idea/
+*.iml
+
+# --- Çevresel Değişkenler ve Şifreler ---
+# Dexcom şifrenizi, DB şifrelerinizi yazacağınız dosyalar asla git'e gitmemeli
+.env
+.env.local
+.env.*
+
+# --- Loglar ve Veritabanı ---
+*.log
+*.sqlite3
+*.sqlite
+
+# --- İşletim Sistemi Dosyaları ---
+.DS_Store
+Thumbs.db

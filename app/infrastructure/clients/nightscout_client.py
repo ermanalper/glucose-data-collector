@@ -5,8 +5,22 @@ from typing import Optional
 
 from app.core.config import NIGHTSCOUT_DOCKER_URL, settings
 from app.infrastructure.interfaces.glucose_provider_interface import IGlucoseProvider
-from app.models.glucose import Glucose
+from app.models.glucose import Glucose, TrendState
 
+NIGHTSCOUT_TREND_MAP = {
+    "DoubleUp": TrendState.DOUBLE_UP,
+    "SingleUp": TrendState.SINGLE_UP,
+    "FortyFiveUp": TrendState.FORTY_FIVE_UP,
+    "Flat": TrendState.FLAT,
+    "FortyFiveDown": TrendState.FORTY_FIVE_DOWN,
+    "SingleDown": TrendState.SINGLE_DOWN,
+    "DoubleDown": TrendState.DOUBLE_DOWN,
+
+    # Nightscout'ta bazen tamamen büyük harf de dönebilir, güvenliğe alalım
+    "NONE": TrendState.UNKNOWN,
+    "NOT COMPUTABLE": TrendState.UNKNOWN,
+    "RATE OUT OF RANGE": TrendState.UNKNOWN
+}
 
 class NightscoutClient(IGlucoseProvider):
     def __init__(self):
@@ -45,10 +59,12 @@ class NightscoutClient(IGlucoseProvider):
             timestamp_ms = latest.get("date")
             dt_object = datetime.datetime.fromtimestamp(timestamp_ms / 1000.0)
 
+            mapped_trend = NIGHTSCOUT_TREND_MAP.get(latest.get("direction"), TrendState.UNKNOWN)
+
             return Glucose(
                 value=latest.get("sgv"),
                 timestamp=dt_object,
-                trend=latest.get("direction"),
+                trend=mapped_trend,
                 source="Nightscout",
                 raw_metadata={
                     "id": latest.get("_id"),
@@ -58,5 +74,5 @@ class NightscoutClient(IGlucoseProvider):
                 }
             )
         except Exception as e:
-            print(f"Nightscout API Hatası: {e}")
+            print(f"Nightscout API Error: {e}")
             return None

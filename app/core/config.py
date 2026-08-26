@@ -4,6 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 # CONSTS BEGIN
 FETCH_IN_MINUTES = 5
 NIGHTSCOUT_DOCKER_URL = "http://localhost:1337/api/v1/entries.json?count=1"
+IS_DEVELOPMENT = True
 # CONSTS END
 
 class Settings(BaseSettings):

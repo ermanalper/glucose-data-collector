@@ -1,7 +1,6 @@
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from app.events.events import timer_ticked_event
-from app.core.config import FETCH_IN_MINUTES
-
+from app.core.config import FETCH_IN_MINUTES, IS_DEVELOPMENT
 
 scheduler = AsyncIOScheduler()
 
@@ -12,5 +11,9 @@ def timer_interrupt_handler():
 
 def start_scheduler():
     # set the timer up
-    scheduler.add_job(timer_interrupt_handler, 'interval', minutes=FETCH_IN_MINUTES)
+    if IS_DEVELOPMENT:
+        scheduler.add_job(timer_interrupt_handler, 'interval', seconds=3)
+    else:
+        scheduler.add_job(timer_interrupt_handler, 'interval', minutes=FETCH_IN_MINUTES)
+
     scheduler.start()

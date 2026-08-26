@@ -1,6 +1,6 @@
 from typing import Optional
-
 from pydexcom import Dexcom, Region
+
 
 from app.core.config import settings
 from app.infrastructure.interfaces.glucose_provider_interface import IGlucoseProvider
@@ -12,6 +12,7 @@ class DexcomShareClient(IGlucoseProvider):
         # ous=True is required for Europe (including Turkey)
         #print("şifre ", settings.dexcom_password)
         #print("username ", settings.dexcom_email)
+        print('Creating DexcomShare instance')
         self._client = Dexcom(password=settings.dexcom_password, username=settings.dexcom_email, region=Region.OUS)
 
     def fetch_latest_reading(self) -> Optional[Glucose]:
@@ -20,18 +21,17 @@ class DexcomShareClient(IGlucoseProvider):
 
             if not bg:
                 return None
-            """
-            return Glucose(
-                value=bg.value,
-                mg_dl=bg.mg_dl,
-                mmol_l=bg.mmol_l,
-                trend=bg.trend,
-                trend_direction=bg.trend_direction,
-                trend_description=bg.trend_description,
-                trend_arrow=bg.trend_arrow,
-                datetime=bg.datetime)
-            """
 
+            return Glucose(
+            value=bg.mg_dl,
+            timestamp=bg.datetime,
+            trend=bg.trend_arrow,
+            source="DexcomShare",
+            raw_metadata={
+                "mmol_l": bg.mmol_l,
+                "trend_integer": bg.trend
+            }
+        )
         except Exception as e:
             print(f"Dexcom API Error: {e}")
             return None

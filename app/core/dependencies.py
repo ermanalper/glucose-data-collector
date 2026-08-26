@@ -1,3 +1,4 @@
+from app.infrastructure.clients.dexcom_client import DexcomShareClient
 from app.infrastructure.clients.nightscout_client import NightscoutClient
 from app.infrastructure.interfaces.glucose_provider_interface import IGlucoseProvider
 
@@ -9,7 +10,6 @@ def get_glucose_provider() -> IGlucoseProvider:
 
     #singleton pattern
     if _glucose_provider_instance is None:
-        print("Creating Nightscout instance")
         _glucose_provider_instance = NightscoutClient()
-
+       # _glucose_provider_instance = DexcomShareClient()
     return _glucose_provider_instance

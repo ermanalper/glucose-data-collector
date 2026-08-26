@@ -1,3 +1,4 @@
+import datetime
 import hashlib
 import requests
 from typing import Optional
@@ -9,6 +10,7 @@ from app.models.glucose import Glucose
 
 class NightscoutClient(IGlucoseProvider):
     def __init__(self):
+        print('Creating Nightscout instance')
         self.base_url = NIGHTSCOUT_DOCKER_URL
         self.raw_api_secret = settings.nightscout_docker_api_secret
 
@@ -40,19 +42,21 @@ class NightscoutClient(IGlucoseProvider):
 
             latest = data[0]
 
-            return Glucose(
-                id=latest.get("_id"),
-                sgv=latest.get("sgv"),
-                date=latest.get("date"),
-                date_string=latest.get("dateString"),
-                trend=latest.get("trend"),
-                direction=latest.get("direction"),
-                device=latest.get("device"),
-                type=latest.get("type"),
-                utc_offset=latest.get("utcOffset"),
-                sys_time=latest.get("sysTime")
-            )
+            timestamp_ms = latest.get("date")
+            dt_object = datetime.datetime.fromtimestamp(timestamp_ms / 1000.0)
 
+            return Glucose(
+                value=latest.get("sgv"),
+                timestamp=dt_object,
+                trend=latest.get("direction"),
+                source="Nightscout",
+                raw_metadata={
+                    "id": latest.get("_id"),
+                    "device": latest.get("device"),
+                    "type": latest.get("type"),
+                    "utc_offset": latest.get("utcOffset")
+                }
+            )
         except Exception as e:
             print(f"Nightscout API Hatası: {e}")
             return None

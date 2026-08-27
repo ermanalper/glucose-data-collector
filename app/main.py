@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 
 import uvicorn
 
+from app.api.routers import glucose_router
 from app.infrastructure.persistence.entities import glucose_orm
 from fastapi import FastAPI
 import app.services.glucose_service
@@ -22,7 +23,7 @@ async def lifespan(app: FastAPI):
 
 Base.metadata.create_all(bind=engine)
 app = FastAPI(lifespan=lifespan)
-
+app.include_router(glucose_router.router)
 
 @app.get("/")
 async def root():

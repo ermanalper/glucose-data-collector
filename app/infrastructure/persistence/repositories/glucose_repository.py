@@ -1,5 +1,7 @@
+from typing import Optional
+
 from app.infrastructure.interfaces.glucose_repository_interface import IGlucoseRepository
-from app.models.glucose import Glucose
+from app.models.glucose import Glucose, TrendState
 from app.infrastructure.persistence.database import SessionLocal
 from app.infrastructure.persistence.entities.glucose_orm import GlucoseEntity
 
@@ -24,3 +26,20 @@ class  SqlAlchemyGlucoseRepository(IGlucoseRepository):
                 # Rollback in case of error
                 session.rollback()
                 print(f"[DB ERROR] SQL error: {e}")
+
+    def get_latest(self, user_id: str) -> Optional[Glucose]:
+        with SessionLocal() as session:
+            entity = session.query(GlucoseEntity) \
+                .filter(GlucoseEntity.user_id == user_id) \
+                .order_by(GlucoseEntity.timestamp.desc()) \
+                .first()
+
+            if not entity:
+                return None
+
+            return Glucose(
+                value=entity.value,
+                timestamp=entity.timestamp,
+                trend=TrendState(entity.trend),
+                source=entity.source
+            )

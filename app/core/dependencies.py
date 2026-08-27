@@ -37,3 +37,13 @@ def get_glucose_repository() -> IGlucoseRepository:
         _glucose_repository_instance = SqlAlchemyGlucoseRepository()
 
     return _glucose_repository_instance
+
+def get_current_user_id() -> str:
+    # This is a self-hosted backend that has single user support.
+    # The reason is, when the user enters their credentials (e.g. username and password)
+    # in the frontend, we cannot hash and secure it, but we must pass them directly to this
+    # backend as plain text, because the backend uses the credentials to log in to
+    # Dexcom Share or Nightscout (or some other client).
+    # Hence, the current user service is not essential, but it is a good thing to do
+    # to help possible further development
+    return "default_user"

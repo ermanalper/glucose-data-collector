@@ -23,13 +23,13 @@ NIGHTSCOUT_TREND_MAP = {
 }
 
 class NightscoutClient(IGlucoseProvider):
-    def __init__(self):
+    def __init__(self, base_url, raw_api_secret):
         print('Creating Nightscout instance')
-        self.base_url = NIGHTSCOUT_DOCKER_URL
-        self.raw_api_secret = settings.nightscout_docker_api_secret
+        self._base_url = NIGHTSCOUT_DOCKER_URL
+        self._raw_api_secret = settings.nightscout_docker_api_secret
 
     def _get_hashed_secret(self) -> str:
-        return hashlib.sha1(self.raw_api_secret.encode('utf-8')).hexdigest()
+        return hashlib.sha1(self._raw_api_secret.encode('utf-8')).hexdigest()
 
     def fetch_latest_reading(self) -> Optional[Glucose]:
         try:
@@ -38,7 +38,7 @@ class NightscoutClient(IGlucoseProvider):
             }
 
             response = requests.get(
-                self.base_url,
+                self._base_url,
                 timeout=10,
                 allow_redirects=False,
                 verify=False,

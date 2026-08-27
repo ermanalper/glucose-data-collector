@@ -23,12 +23,10 @@ DEXCOM_TREND_MAP = {
 }
 
 class DexcomShareClient(IGlucoseProvider):
-    def __init__(self):
+    def __init__(self, username, password):
         # ous=True is required for Europe (including Turkey)
-        #print("şifre ", settings.dexcom_password)
-        #print("username ", settings.dexcom_email)
         print('Creating DexcomShare instance')
-        self._client = Dexcom(password=settings.dexcom_password, username=settings.dexcom_email, region=Region.OUS)
+        self._client = Dexcom(password=password, username=username, region=Region.OUS)
 
     def fetch_latest_reading(self) -> Optional[Glucose]:
         try:

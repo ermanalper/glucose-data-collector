@@ -15,5 +15,4 @@ def start_scheduler():
         scheduler.add_job(timer_interrupt_handler, 'interval', seconds=3)
     else:
         scheduler.add_job(timer_interrupt_handler, 'interval', minutes=FETCH_IN_MINUTES)
-
     scheduler.start()

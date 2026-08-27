@@ -1,9 +1,13 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+import uvicorn
 
-from app.services.scheduler import start_scheduler
+from app.infrastructure.persistence.entities import glucose_orm
+from fastapi import FastAPI
 import app.services.glucose_service
+import app.services.storage_service
+from app.infrastructure.persistence.database import Base, engine
+from app.services.scheduler import start_scheduler
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -16,7 +20,7 @@ async def lifespan(app: FastAPI):
     print("FastAPI app shutting down...")
 
 
-
+Base.metadata.create_all(bind=engine)
 app = FastAPI(lifespan=lifespan)
 
 

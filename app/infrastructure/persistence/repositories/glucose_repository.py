@@ -27,19 +27,37 @@ class  SqlAlchemyGlucoseRepository(IGlucoseRepository):
                 session.rollback()
                 print(f"[DB ERROR] SQL error: {e}")
 
+    '''
+    :param user_id: The target user's id. (This is a self-hosted backend, so 
+                    it supports only one user unless changed. Try 'default_user')
+    :returns:       The last glucose reading
+    '''
     def get_latest(self, user_id: str) -> Optional[Glucose]:
+        results = self.get_latest_n(user_id, 1)
+        if not results:
+            return None
+        return results[0]
+
+    '''
+    :param user_id: The target user's id. (This is a self-hosted backend, so 
+                    it supports only one user unless changed. Try 'default_user')
+    :param n:       Last n glucose readings. If there are less than n glucose readings,
+                    all readings are returned.
+    :returns:       The last n glucose readings.
+    '''
+    def get_latest_n(self, user_id: str, n: int) -> list[Glucose]:
         with SessionLocal() as session:
-            entity = session.query(GlucoseEntity) \
+            entities = session.query(GlucoseEntity) \
                 .filter(GlucoseEntity.user_id == user_id) \
                 .order_by(GlucoseEntity.timestamp.desc()) \
-                .first()
-
-            if not entity:
-                return None
-
-            return Glucose(
-                value=entity.value,
-                timestamp=entity.timestamp,
-                trend=TrendState(entity.trend),
-                source=entity.source
-            )
+                .limit(n) \
+                .all()
+            return [
+                Glucose(
+                    value=entity.value,
+                    timestamp=entity.timestamp,
+                    trend=TrendState(entity.trend),
+                    source=entity.source
+                )
+                for entity in entities
+            ]

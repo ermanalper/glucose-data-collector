@@ -46,7 +46,7 @@ class NightscoutClient(IGlucoseProvider):
             )
 
             if response.status_code != 200:
-                print(f"DEBUG: Sunucudan {response.status_code} kodu geldi. İçerik: {response.text}")
+                print(f"DEBUG: Server Response: {response.status_code}  {response.text}")
                 return None
 
             data = response.json()

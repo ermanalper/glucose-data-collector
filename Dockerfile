@@ -2,7 +2,8 @@ FROM python:3.14-slim
 
 # Konteyner içindeki çalışma dizinini belirliyoruz
 WORKDIR /app
-
+ENV PYTHONUNBUFFERED=1 
+#BUFFER YOK. FORCE PRINT
 # Önce sadece requirements.txt dosyasını kopyalıyoruz (Cache optimizasyonu için)
 COPY requirements.txt .
 

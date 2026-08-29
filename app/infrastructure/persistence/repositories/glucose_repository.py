@@ -45,11 +45,12 @@ class  SqlAlchemyGlucoseRepository(IGlucoseRepository):
                     all readings are returned.
     :returns:       The last n glucose readings.
     '''
-    def get_latest_n(self, user_id: str, n: int) -> list[Glucose]:
+    def get_latest_n(self, user_id: str, n: int, offset: int = 0) -> list[Glucose]:
         with SessionLocal() as session:
             entities = session.query(GlucoseEntity) \
                 .filter(GlucoseEntity.user_id == user_id) \
                 .order_by(GlucoseEntity.timestamp.desc()) \
+                .offset(offset) \
                 .limit(n) \
                 .all()
             return [

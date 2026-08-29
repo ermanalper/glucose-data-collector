@@ -14,5 +14,5 @@ class IGlucoseRepository(ABC):
         pass
 
     @abstractmethod
-    def get_latest_n(self, user_id: str, n: int) -> list[Glucose]:
+    def get_latest_n(self, user_id: str, n: int, offset: int) -> list[Glucose]:
         pass

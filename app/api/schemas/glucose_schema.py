@@ -7,6 +7,6 @@ class GlucoseResponse(BaseModel):
     timestamp: datetime
     trend: str
     source: str
-
+    status: str #estimation of current status
     # auto read orm objects (pydantic v2 setting)
     model_config = {"from_attributes": True}

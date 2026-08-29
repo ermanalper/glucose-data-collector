@@ -21,17 +21,19 @@ async def get_latest_glucose(
         value=latest_data.value,
         timestamp=latest_data.timestamp,
         trend=latest_data.trend.value,
-        source=latest_data.source
+        source=latest_data.source,
+        status=latest_data.status
     )
 
 
 @router.get("/history", response_model=list[GlucoseResponse])
 async def get_glucose_history(
         limit: int = Query(default=10, ge=1, le=100, description="Number of latest readings to be fetched"),
+        offset: int = Query(default=0, ge=0, description="Number of latest readiangs to skip"),
         current_user_id: str = Depends(get_current_user_id),
         repo: IGlucoseRepository = Depends(get_glucose_repository)
 ):
-    historical_data = repo.get_latest_n(user_id=current_user_id, n=limit)
+    historical_data = repo.get_latest_n(user_id=current_user_id, n=limit, offset=offset)
 
     if not historical_data:
         raise ResourceNotFoundException("No glucose data found for this user.")
@@ -41,7 +43,8 @@ async def get_glucose_history(
             value=data.value,
             timestamp=data.timestamp,
             trend=data.trend.value,
-            source=data.source
+            source=data.source,
+            status=data.status
         )
         for data in historical_data
     ]

@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from typing import Optional
 
 from app.infrastructure.interfaces.glucose_repository_interface import IGlucoseRepository
@@ -53,6 +54,30 @@ class  SqlAlchemyGlucoseRepository(IGlucoseRepository):
                 .offset(offset) \
                 .limit(n) \
                 .all()
+            return [
+                Glucose(
+                    value=entity.value,
+                    timestamp=entity.timestamp,
+                    trend=TrendState(entity.trend),
+                    source=entity.source
+                )
+                for entity in entities
+            ]
+
+    def get_by_time_interval(self, user_id: str, start: datetime, end: datetime) -> list[Glucose]:
+        if start.tzinfo is None:
+            start = start.replace(tzinfo=timezone.utc)
+        if end.tzinfo is None:
+            end = end.replace(tzinfo=timezone.utc)
+
+        with SessionLocal() as session:
+            entities = session.query(GlucoseEntity) \
+                .filter(GlucoseEntity.user_id == user_id) \
+                .filter(GlucoseEntity.timestamp >= start) \
+                .filter(GlucoseEntity.timestamp <= end) \
+                .order_by(GlucoseEntity.timestamp.desc()) \
+                .all()
+
             return [
                 Glucose(
                     value=entity.value,

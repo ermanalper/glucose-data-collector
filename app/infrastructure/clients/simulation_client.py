@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timezone
 import json
 from typing import Optional
 
@@ -39,7 +39,7 @@ class SimulationClient(IGlucoseProvider):
         raw_item = self._mock_data[self._current_index]
         self._current_index += 1
 
-        dt_object = datetime.datetime.now()
+        dt_object = datetime.now(timezone.utc)
         mapped_trend = SIMULATION_TREND_MAP.get(raw_item["trend"], TrendState.UNKNOWN)
         return Glucose(
             value=raw_item["value"],

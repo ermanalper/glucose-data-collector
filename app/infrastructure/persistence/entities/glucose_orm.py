@@ -9,7 +9,7 @@ class GlucoseEntity(Base):
     user_id = Column(String, index=True, nullable=False, default="default_user")
 
     value = Column(Integer, nullable=False)
-    timestamp = Column(DateTime, nullable=False, index=True)
+    timestamp = Column(DateTime(timezone=True), nullable=False, index=True)
     trend = Column(String, nullable=False)
     source = Column(String, nullable=False)
 

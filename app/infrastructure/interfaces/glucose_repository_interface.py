@@ -16,3 +16,7 @@ class IGlucoseRepository(ABC):
     @abstractmethod
     def get_latest_n(self, user_id: str, n: int, offset: int) -> list[Glucose]:
         pass
+
+    @abstractmethod
+    def get_by_time_interval(self, user_id, start, end):
+        pass

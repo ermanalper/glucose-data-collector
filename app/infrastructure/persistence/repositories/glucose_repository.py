@@ -1,6 +1,8 @@
 from datetime import datetime, timezone
 from typing import Optional
 
+from app.api.schemas.timestamp_schema import TimestampResponse
+from app.core.exceptions import MissingArgumentException, ResourceNotFoundException
 from app.infrastructure.interfaces.glucose_repository_interface import IGlucoseRepository
 from app.models.glucose import Glucose, TrendState
 from app.infrastructure.persistence.database import SessionLocal
@@ -87,3 +89,17 @@ class  SqlAlchemyGlucoseRepository(IGlucoseRepository):
                 )
                 for entity in entities
             ]
+
+    def get_first_entry_date(self, user_id: str) -> datetime:
+        if user_id is None:
+            raise MissingArgumentException("Current user ID argument is missing.")
+
+        with SessionLocal() as session:
+            first_entity = session.query(GlucoseEntity) \
+                .filter(GlucoseEntity.user_id == user_id) \
+                .order_by(GlucoseEntity.timestamp.asc()) \
+                .first()
+            if not first_entity:
+                raise ResourceNotFoundException("No glucose data found for this user")
+
+            return first_entity.timestamp

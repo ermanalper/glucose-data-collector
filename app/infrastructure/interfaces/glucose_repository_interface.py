@@ -20,3 +20,7 @@ class IGlucoseRepository(ABC):
     @abstractmethod
     def get_by_time_interval(self, user_id, start, end):
         pass
+
+    @abstractmethod
+    def get_first_entry_date(self, current_user_id):
+        pass

@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, Query
 from app.api.schemas.glucose_schema import GlucoseResponse
+from app.api.schemas.timestamp_schema import TimestampResponse
 from app.core.exceptions import ResourceNotFoundException
 from app.infrastructure.interfaces.glucose_repository_interface import IGlucoseRepository
 from app.core.dependencies import get_glucose_repository, get_current_user_id
@@ -76,3 +77,10 @@ async def get_glucose_history_time_interval(
         )
         for data in historical_data
     ]
+
+@router.get("/first-data-date", response_model=TimestampResponse)
+async def get_first_data_date(
+        current_user_id: str = Depends(get_current_user_id),
+        repo: IGlucoseRepository = Depends(get_glucose_repository)):
+    first_entry_date = repo.get_first_entry_date(current_user_id)
+    return TimestampResponse(timestamp=first_entry_date)

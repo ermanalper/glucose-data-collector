@@ -12,7 +12,7 @@ def timer_interrupt_handler():
 def start_scheduler():
     # set the timer up
     if IS_DEVELOPMENT:
-        scheduler.add_job(timer_interrupt_handler, 'interval', minutes=2)
+        scheduler.add_job(timer_interrupt_handler, 'interval', seconds=30)
     else:
         scheduler.add_job(timer_interrupt_handler, 'interval', minutes=FETCH_IN_MINUTES)
     scheduler.start()

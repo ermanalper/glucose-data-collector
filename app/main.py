@@ -10,7 +10,7 @@ import app.services.glucose_service
 import app.services.storage_service
 from app.infrastructure.persistence.database import Base, engine
 from app.services.scheduler import start_scheduler
-
+from app.services.push_glucose_to_sse import push_glucose_to_sse
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # 5-minutes timer

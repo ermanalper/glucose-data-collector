@@ -1,15 +1,21 @@
 from pathlib import Path
 
 from app.core.config import IS_DEVELOPMENT, settings, NIGHTSCOUT_DOCKER_URL
+from app.infrastructure.broadcasters.memory_sse_broadcaster import MemorySSEBroadcaster
 from app.infrastructure.clients.dexcom_client import DexcomShareClient
 from app.infrastructure.clients.nightscout_client import NightscoutClient
 from app.infrastructure.clients.simulation_client import SimulationClient
 from app.infrastructure.interfaces.glucose_provider_interface import IGlucoseProvider
 from app.infrastructure.interfaces.glucose_repository_interface import IGlucoseRepository
+from app.infrastructure.interfaces.serializer_interface import ISerializer
+from app.infrastructure.interfaces.sse_broadcaster_interface import ISSEBroadcaster
 from app.infrastructure.persistence.repositories.glucose_repository import SqlAlchemyGlucoseRepository
+from app.infrastructure.serializers.json_serializer import JsonSerializer
 
 _glucose_provider_instance = None # Singleton instance
 _glucose_repository_instance = None # Singleton instance
+_sse_broadcaster_instance = None
+_serializer_instance = None
 
 def get_glucose_provider() -> IGlucoseProvider:
     global _glucose_provider_instance
@@ -47,3 +53,15 @@ def get_current_user_id() -> str:
     # Hence, the current user service is not essential, but it is a good thing to do
     # to help possible further development
     return "default_user"
+
+def get_sse_broadcaster() -> ISSEBroadcaster:
+    global _sse_broadcaster_instance
+    if _sse_broadcaster_instance is None:
+        _sse_broadcaster_instance = MemorySSEBroadcaster()
+    return _sse_broadcaster_instance
+
+def get_serializer() -> ISerializer:
+    global _serializer_instance
+    if _serializer_instance is None:
+        _serializer_instance = JsonSerializer()
+    return _serializer_instance

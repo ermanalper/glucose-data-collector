@@ -1,7 +1,6 @@
 from datetime import datetime, timezone
 from typing import Optional
 
-from app.api.schemas.timestamp_schema import TimestampResponse
 from app.core.exceptions import MissingArgumentException, ResourceNotFoundException
 from app.infrastructure.interfaces.glucose_repository_interface import IGlucoseRepository
 from app.models.glucose import Glucose, TrendState

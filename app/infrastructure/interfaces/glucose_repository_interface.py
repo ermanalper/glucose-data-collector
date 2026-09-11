@@ -18,7 +18,7 @@ class IGlucoseRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_time_interval(self, user_id, start, end):
+    def get_by_time_interval(self, user_id, start, end) -> list[Glucose]:
         pass
 
     @abstractmethod

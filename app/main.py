@@ -3,6 +3,7 @@ import uvicorn
 from starlette.responses import JSONResponse
 
 from app.api.routers import glucose_router
+from app.core.dependencies import get_glucose_service
 from app.core.exceptions import ResourceNotFoundException
 from app.infrastructure.persistence.entities import glucose_orm
 from fastapi import FastAPI, Request
@@ -11,10 +12,16 @@ import app.services.storage_service
 from app.infrastructure.persistence.database import Base, engine
 from app.services.scheduler import start_scheduler
 from app.services.push_glucose_to_sse import push_glucose_to_sse
+
+def _init_services():
+    get_glucose_service()
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # 5-minutes timer
     start_scheduler()
+
+    _init_services()
 
     yield
 
@@ -37,6 +44,8 @@ async def resource_not_found_handler(request: Request, exc: ResourceNotFoundExce
             "path": request.url.path
         }
     )
+
+
 @app.get("/")
 async def root():
     return {"App running..."}

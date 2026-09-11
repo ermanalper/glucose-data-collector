@@ -3,11 +3,11 @@ from fastapi import APIRouter, Depends, Query
 from app.api.schemas.glucose_schema import GlucoseResponse
 from app.api.schemas.timestamp_schema import TimestampResponse
 from app.core.exceptions import ResourceNotFoundException
-from app.infrastructure.interfaces.glucose_repository_interface import IGlucoseRepository
-from app.core.dependencies import get_glucose_repository, get_current_user_id
+from app.core.dependencies import get_current_user_id, get_glucose_service
 from fastapi import APIRouter, Depends, Request
 from sse_starlette.sse import EventSourceResponse
 from app.core.dependencies import get_sse_broadcaster
+from app.infrastructure.interfaces.glucose_service_interface import IGlucoseService
 from app.infrastructure.interfaces.sse_broadcaster_interface import ISSEBroadcaster
 router = APIRouter(prefix="/api/v1/glucose", tags=["Glucose Data"])
 
@@ -15,13 +15,9 @@ router = APIRouter(prefix="/api/v1/glucose", tags=["Glucose Data"])
 @router.get("/latest", response_model=GlucoseResponse)
 async def get_latest_glucose(
         current_user_id: str = Depends(get_current_user_id),
-        repo: IGlucoseRepository = Depends(get_glucose_repository)
+        service: IGlucoseService = Depends(get_glucose_service)
 ):
-    latest_data = repo.get_latest(user_id=current_user_id)
-
-    if not latest_data:
-        raise ResourceNotFoundException("No glucose data found for this user.")
-
+    latest_data = service.get_latest_glucose(user_id=current_user_id)
     return GlucoseResponse(
         value=latest_data.value,
         timestamp=latest_data.timestamp,
@@ -36,12 +32,10 @@ async def get_glucose_history_data_count_offset(
         limit: int = Query(default=10, ge=1, le=100, description="Number of latest readings to be fetched"),
         offset: int = Query(default=0, ge=0, description="Number of latest readiangs to skip"),
         current_user_id: str = Depends(get_current_user_id),
-        repo: IGlucoseRepository = Depends(get_glucose_repository)
+        service: IGlucoseService = Depends(get_glucose_service)
 ):
-    historical_data = repo.get_latest_n(user_id=current_user_id, n=limit, offset=offset)
+    historical_data = service.get_latest_n_readings(user_id=current_user_id, n=limit, offset=offset)
 
-    if not historical_data:
-        raise ResourceNotFoundException("No glucose data found for this user.")
 
     return [
         GlucoseResponse(
@@ -59,16 +53,13 @@ async def get_glucose_history_time_interval(
         start_time: datetime = Query(..., description="Start time (e.g.: 2026-08-28T10:00:00)"),
         end_time: datetime = Query(default_factory=lambda: datetime.now(timezone.utc), description="End time (Default: UTC now)"),
         current_user_id: str = Depends(get_current_user_id),
-        repo: IGlucoseRepository = Depends(get_glucose_repository)
+        service: IGlucoseService = Depends(get_glucose_service)
 ):
-    historical_data = repo.get_by_time_interval(
+    historical_data = service.get_glucose_by_time_interval(
         user_id=current_user_id,
         start=start_time,
         end=end_time
     )
-
-    if not historical_data:
-        raise ResourceNotFoundException("No glucose data found for this time interval.")
 
     return [
         GlucoseResponse(
@@ -84,13 +75,13 @@ async def get_glucose_history_time_interval(
 @router.get("/first-data-date", response_model=TimestampResponse)
 async def get_first_data_date(
         current_user_id: str = Depends(get_current_user_id),
-        repo: IGlucoseRepository = Depends(get_glucose_repository)):
-    first_entry_date = repo.get_first_entry_date(current_user_id)
+        service: IGlucoseService = Depends(get_glucose_service)):
+    first_entry_date = service.get_first_glucose_entry_date(current_user_id)
     return TimestampResponse(timestamp=first_entry_date)
 
 @router.get("/stream", description="Glucose data tunnel to frontends")
 async def stream_glucose(
     request: Request,
-    broadcaster: ISSEBroadcaster = Depends(get_sse_broadcaster)
+    service: IGlucoseService = Depends(get_glucose_service)
 ):
-    return EventSourceResponse(broadcaster.subscribe())
+    return EventSourceResponse(service.subscribe_to_glucose_stream())

@@ -8,7 +8,7 @@ from app.infrastructure.persistence.database import SessionLocal
 from app.infrastructure.persistence.entities.glucose_orm import GlucoseEntity
 
 
-class  SqlAlchemyGlucoseRepository(IGlucoseRepository):
+class SqlAlchemyGlucoseRepository(IGlucoseRepository):
     def save(self, glucose: Glucose) -> None:
          with SessionLocal() as session:
             try:

@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from fastapi import Depends
+
 from app.core.config import IS_DEVELOPMENT, settings, NIGHTSCOUT_DOCKER_URL
 from app.infrastructure.broadcasters.memory_sse_broadcaster import MemorySSEBroadcaster
 from app.infrastructure.clients.dexcom_client import DexcomShareClient
@@ -7,16 +9,21 @@ from app.infrastructure.clients.nightscout_client import NightscoutClient
 from app.infrastructure.clients.simulation_client import SimulationClient
 from app.infrastructure.interfaces.glucose_provider_interface import IGlucoseProvider
 from app.infrastructure.interfaces.glucose_repository_interface import IGlucoseRepository
+from app.infrastructure.interfaces.glucose_service_interface import IGlucoseService
+from app.infrastructure.interfaces.insulin_repository_interface import IInsulinRepository
 from app.infrastructure.interfaces.serializer_interface import ISerializer
 from app.infrastructure.interfaces.sse_broadcaster_interface import ISSEBroadcaster
 from app.infrastructure.persistence.repositories.glucose_repository import SqlAlchemyGlucoseRepository
+from app.infrastructure.persistence.repositories.insulin_repository import SqlAlchemyInsulinRepository
 from app.infrastructure.serializers.json_serializer import JsonSerializer
+from app.services.glucose_service import GlucoseServiceImpl
 
 _glucose_provider_instance = None # Singleton instance
 _glucose_repository_instance = None # Singleton instance
 _sse_broadcaster_instance = None
 _serializer_instance = None
-
+_insulin_repository_instance = None
+_glucose_service_instance = None
 def get_glucose_provider() -> IGlucoseProvider:
     global _glucose_provider_instance
     #singleton pattern
@@ -65,3 +72,21 @@ def get_serializer() -> ISerializer:
     if _serializer_instance is None:
         _serializer_instance = JsonSerializer()
     return _serializer_instance
+
+def get_insulin_repository() -> IInsulinRepository:
+    global _insulin_repository_instance
+    if _insulin_repository_instance is None:
+        _insulin_repository_instance = SqlAlchemyInsulinRepository()
+    return _insulin_repository_instance
+
+def get_glucose_service() -> IGlucoseService:
+    global _glucose_service_instance
+
+    if _glucose_service_instance is None:
+        _glucose_service_instance = GlucoseServiceImpl(
+            repo=get_glucose_repository(),
+            broadcaster=get_sse_broadcaster(),
+            provider=get_glucose_provider()
+        )
+
+    return _glucose_service_instance

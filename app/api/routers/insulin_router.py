@@ -4,7 +4,7 @@ from typing import List
 from fastapi import APIRouter, Depends, Query
 
 from app.api.schemas.insulin_dose_schema import InsulinDoseResponse
-from app.api.schemas.insulin_schema import InsulinDoseRequest
+from app.api.schemas.insulin_schema import InsulinDoseRequest, InsulinResponse
 from app.core.dependencies import get_current_user_id, get_insulin_service
 from app.infrastructure.interfaces.insulin_service_interface import IInsulinService
 
@@ -55,12 +55,16 @@ async def get_insulin_dose_history_time_interval(
        for insulin_dose in dose_history
    ]
 
-@router.get("/insulin-types", response_model=List[str])
+@router.get("/insulin-types", response_model=List[InsulinResponse])
 async def get_insulin_types(
         service : IInsulinService = Depends(get_insulin_service)
 ):
     insulin_types = service.get_insulin_types()
     return [
-        insulin_type.name
+        InsulinResponse(
+            id=insulin_type.id,
+            type=insulin_type.name
+        )
+
         for insulin_type in insulin_types
     ]

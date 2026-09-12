@@ -19,5 +19,5 @@ class IInsulinRepository(ABC):
         pass
 
     @abstractmethod
-    def get_insulin_types(self) -> List[str]:
+    def get_insulin_types(self) -> List[Insulin]:
         pass

@@ -1,6 +1,8 @@
+from datetime import timezone
+from typing import List
+
 from sqlalchemy.exc import IntegrityError
 
-from app.api.schemas.insulin_dose_schema import InsulinDoseResponse
 from app.core.exceptions import DuplicateEntiresException, DatabaseError, ResourceNotFoundException
 from app.infrastructure.interfaces.insulin_repository_interface import IInsulinRepository
 from app.infrastructure.persistence.entities.insulin_dose_orm import InsulinDoseEntity
@@ -11,6 +13,35 @@ from app.models.insulin_dose import InsulinDose
 
 
 class SqlAlchemyInsulinRepository(IInsulinRepository):
+    def get_insulin_history_by_time_interval(self, start_time, end_time, user_id) -> List[InsulinDose]:
+        if start_time.tzinfo is None:
+            start_time = start_time.replace(tzinfo=timezone.utc)
+        if end_time.tzinfo is None:
+            end_time = end_time.replace(tzinfo=timezone.utc)
+
+        with SessionLocal() as session:
+            entities = session.query(InsulinDoseEntity) \
+                .filter(InsulinDoseEntity.user_id == user_id) \
+                .filter(InsulinDoseEntity.timestamp >= start_time) \
+                .filter(InsulinDoseEntity.timestamp <= end_time) \
+                .order_by(InsulinDoseEntity.timestamp.desc()) \
+                .all()
+        return [
+            InsulinDose(
+                user_id=entity.user_id,
+                insulin_type=Insulin(
+                    id=entity.insulin_type.id,
+                    name=entity.insulin_type.type
+                ),
+                dose=entity.dose,
+                timestamp=entity.timestamp
+            )
+            for entity in entities
+        ]
+
+
+
+
     def add_insulin(self, insulin: Insulin) -> None:
         with SessionLocal() as session:
             try:
@@ -38,7 +69,7 @@ class SqlAlchemyInsulinRepository(IInsulinRepository):
                 )
                 session.add(db_entity)
                 session.commit()
-                return InsulinDoseResponse(message=f"Insuline dose successfully entered. User: '{insulin_dose.user_id} Insulin type ID: '{insulin_dose.insulin_type.id} Dose: '{insulin_dose.dose}'")
+                return "Insulin dose successfully entered. User: '{insulin_dose.user_id} Insulin type ID: '{insulin_dose.insulin_type.id} Dose: '{insulin_dose.dose}'"
             except IntegrityError as e:
                 session.rollback()
                 error_str = str(e.orig)

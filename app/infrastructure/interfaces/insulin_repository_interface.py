@@ -12,3 +12,7 @@ class IInsulinRepository(ABC):
     @abstractmethod
     def enter_insulin_dose(self, dose: InsulinDose):
         pass
+
+    @abstractmethod
+    def get_insulin_history_by_time_interval(self, start_time, end_time, user_id):
+        pass

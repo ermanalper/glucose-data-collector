@@ -1,4 +1,7 @@
-from fastapi import APIRouter, Depends
+from datetime import datetime, timezone
+from typing import List
+
+from fastapi import APIRouter, Depends, Query
 
 from app.api.schemas.insulin_dose_schema import InsulinDoseResponse
 from app.api.schemas.insulin_schema import InsulinDoseRequest
@@ -18,7 +21,7 @@ async def add_new_insulin(
     return True
 
 
-@router.post("/enter-insulin-dose", response_model=InsulinDoseResponse)
+@router.post("/enter-insulin-dose", response_model=str)
 async def enter_insulin_dose(
         payload: InsulinDoseRequest,
         current_user_id: str = Depends(get_current_user_id),
@@ -32,3 +35,21 @@ async def enter_insulin_dose(
     )
 
     return result
+
+@router.get("/history/by-time", response_model=List[InsulinDoseResponse])
+async def get_insulin_dose_history_time_interval(
+            start_time: datetime = Query(..., description="Start time (e.g.: 2026-08-28T10:00:00)"),
+            end_time: datetime = Query(default_factory=lambda: datetime.now(timezone.utc),
+                                       description="End time (Default: UTC now)"),
+            current_user_id: str = Depends(get_current_user_id),
+            service: IInsulinService = Depends(get_insulin_service)
+):
+   dose_history = service.get_insulin_history_by_time_interval(start_time=start_time, end_time=end_time, user_id=current_user_id)
+   return [
+       InsulinDoseResponse(
+           insuline_type=insulin_dose.insulin_type.name,
+           dose=insulin_dose.dose,
+           timestamp=insulin_dose.timestamp
+       )
+       for insulin_dose in dose_history
+   ]

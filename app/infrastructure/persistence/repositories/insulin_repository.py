@@ -65,7 +65,8 @@ class SqlAlchemyInsulinRepository(IInsulinRepository):
                     user_id=insulin_dose.user_id,
                     insulin_type_id=insulin_dose.insulin_type.id,
                     dose=insulin_dose.dose,
-                    timestamp=insulin_dose.timestamp
+                    timestamp=insulin_dose.timestamp,
+                    glucose_val=insulin_dose.glucose_value
                 )
                 session.add(db_entity)
                 session.commit()

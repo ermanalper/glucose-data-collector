@@ -47,7 +47,7 @@ async def get_insulin_dose_history_time_interval(
    dose_history = service.get_insulin_history_by_time_interval(start_time=start_time, end_time=end_time, user_id=current_user_id)
    return [
        InsulinDoseResponse(
-           insuline_type=insulin_dose.insulin_type.name,
+           insulin_type=insulin_dose.insulin_type.name,
            dose=insulin_dose.dose,
            timestamp=insulin_dose.timestamp
        )

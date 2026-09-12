@@ -97,5 +97,7 @@ def get_glucose_service() -> IGlucoseService:
 def get_insulin_service() -> IInsulinService:
     global _insulin_service_instance
     if _insulin_service_instance is None:
-        _insulin_service_instance = InsulinServiceImpl(insulin_repo=get_insulin_repository())
+        _insulin_service_instance = InsulinServiceImpl(
+            insulin_repo=get_insulin_repository(),
+            glucose_service=get_glucose_service())
     return _insulin_service_instance

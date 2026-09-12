@@ -15,3 +15,4 @@ class InsulinDoseEntity(Base):
     __table_args__ = (
         UniqueConstraint('user_id', 'timestamp', name='uix_insulin_doses_user_timestamp'),  # timestamps must be unique
     )
+    glucose_val = Column(Integer)

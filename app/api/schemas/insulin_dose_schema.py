@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 
 class InsulinDoseResponse(BaseModel):
-    insuline_type: str
+    insulin_type: str
     timestamp: datetime
     dose: float
 

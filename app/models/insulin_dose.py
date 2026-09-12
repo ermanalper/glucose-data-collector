@@ -10,3 +10,4 @@ class InsulinDose:
     insulin_type: Insulin
     dose: float
     timestamp: datetime
+    glucose_value: int # the glucose value when the dose is shot

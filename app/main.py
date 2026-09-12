@@ -4,7 +4,7 @@ from starlette.responses import JSONResponse
 
 from app.api.routers import glucose_router, insulin_router
 from app.core.dependencies import get_glucose_service, get_insulin_service
-from app.core.exceptions import ResourceNotFoundException
+from app.core.exceptions import ResourceNotFoundException, DatabaseError
 from app.infrastructure.persistence.entities import glucose_orm
 from app.infrastructure.persistence.entities import insulin_orm
 from fastapi import FastAPI, Request
@@ -48,6 +48,20 @@ async def resource_not_found_handler(request: Request, exc: ResourceNotFoundExce
         }
     )
 
+
+@app.exception_handler(DatabaseError)
+async def database_error_handler(request: Request, exc: DatabaseError):
+    status_code = 409 if "already" in exc.message else 400
+
+    return JSONResponse(
+        status_code=status_code,
+        content={
+            "success": False,
+            "error_type": "DATABASE_ERROR",
+            "message": exc.message,
+            "path": request.url.path
+        }
+    )
 
 @app.get("/")
 async def root():

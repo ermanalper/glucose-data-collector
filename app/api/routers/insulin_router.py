@@ -1,10 +1,8 @@
 from fastapi import APIRouter, Depends
 
-from app.core.dependencies import get_current_user_id, get_insulin_repository
-from app.infrastructure.interfaces.insulin_repository_interface import IInsulinRepository
+from app.core.dependencies import get_current_user_id, get_insulin_service
+from app.infrastructure.interfaces.insulin_service_interface import IInsulinService
 
-#from app.services.insulin_service import InsulinService
-#from app.core.dependencies import get_insulin_service
 
 router = APIRouter(prefix="/api/v1/insulin", tags=["Insulin Data"])
 
@@ -13,7 +11,7 @@ router = APIRouter(prefix="/api/v1/insulin", tags=["Insulin Data"])
 async def add_new_insulin(
         insulin_name: str,
         current_user_id: str = Depends(get_current_user_id),
-        service: IInsulinService
+        service: IInsulinService = Depends(get_insulin_service)
 ):
-
+    service.add_new_insulin_type(current_user_id, insulin_name)
     return True

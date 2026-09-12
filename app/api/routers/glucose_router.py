@@ -1,14 +1,11 @@
 from datetime import datetime, timezone
-from fastapi import APIRouter, Depends, Query
+from fastapi import Query
 from app.api.schemas.glucose_schema import GlucoseResponse
 from app.api.schemas.timestamp_schema import TimestampResponse
-from app.core.exceptions import ResourceNotFoundException
 from app.core.dependencies import get_current_user_id, get_glucose_service
 from fastapi import APIRouter, Depends, Request
 from sse_starlette.sse import EventSourceResponse
-from app.core.dependencies import get_sse_broadcaster
 from app.infrastructure.interfaces.glucose_service_interface import IGlucoseService
-from app.infrastructure.interfaces.sse_broadcaster_interface import ISSEBroadcaster
 router = APIRouter(prefix="/api/v1/glucose", tags=["Glucose Data"])
 
 

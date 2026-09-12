@@ -34,7 +34,8 @@ class SqlAlchemyInsulinRepository(IInsulinRepository):
                     name=entity.insulin_type.type
                 ),
                 dose=entity.dose,
-                timestamp=entity.timestamp
+                timestamp=entity.timestamp,
+                glucose_value=entity.glucose_val
             )
             for entity in entities
         ]

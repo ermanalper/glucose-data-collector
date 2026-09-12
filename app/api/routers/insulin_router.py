@@ -49,7 +49,8 @@ async def get_insulin_dose_history_time_interval(
        InsulinDoseResponse(
            insulin_type=insulin_dose.insulin_type.name,
            dose=insulin_dose.dose,
-           timestamp=insulin_dose.timestamp
+           timestamp=insulin_dose.timestamp,
+           glucose_val=insulin_dose.glucose_value
        )
        for insulin_dose in dose_history
    ]

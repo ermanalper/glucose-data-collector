@@ -22,5 +22,5 @@ class IGlucoseRepository(ABC):
         pass
 
     @abstractmethod
-    def get_first_entry_date(self, current_user_id):
+    def get_first_entry_date(self, user_id):
         pass

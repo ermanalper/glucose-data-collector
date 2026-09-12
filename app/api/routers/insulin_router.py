@@ -54,3 +54,13 @@ async def get_insulin_dose_history_time_interval(
        )
        for insulin_dose in dose_history
    ]
+
+@router.get("/insulin-types", response_model=List[str])
+async def get_insulin_types(
+        service : IInsulinService = Depends(get_insulin_service)
+):
+    insulin_types = service.get_insulin_types()
+    return [
+        insulin_type.name
+        for insulin_type in insulin_types
+    ]

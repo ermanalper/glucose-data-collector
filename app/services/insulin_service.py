@@ -15,6 +15,12 @@ class InsulinServiceImpl(IInsulinService):
         self._repo = insulin_repo
         self._glucose_service = glucose_service
 
+    def get_insulin_types(self):
+        insulin_types = self._repo.get_insulin_types()
+        if not insulin_types:
+            raise ResourceNotFoundException("There is no insulin type in the system")
+        return insulin_types
+
     def _get_glucose_value_at_time(self, user_id: str, timestamp: datetime) -> Optional[int]:
         start_time = timestamp - datetime.timedelta(minutes=15)
         end_time = timestamp + datetime.timedelta(minutes=15)

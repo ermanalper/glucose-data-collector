@@ -13,6 +13,17 @@ from app.models.insulin_dose import InsulinDose
 
 
 class SqlAlchemyInsulinRepository(IInsulinRepository):
+    def get_insulin_types(self):
+        with SessionLocal() as session:
+            entities = session.query(InsulinEntity) \
+                .order_by(InsulinEntity.id) \
+                .all()
+        return [
+            Insulin(id=entity.id, name=entity.type)
+            for entity in entities
+        ]
+
+
     def get_insulin_history_by_time_interval(self, start_time, end_time, user_id) -> List[InsulinDose]:
         if start_time.tzinfo is None:
             start_time = start_time.replace(tzinfo=timezone.utc)
@@ -39,9 +50,6 @@ class SqlAlchemyInsulinRepository(IInsulinRepository):
             )
             for entity in entities
         ]
-
-
-
 
     def add_insulin(self, insulin: Insulin) -> None:
         with SessionLocal() as session:

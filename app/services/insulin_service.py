@@ -1,5 +1,4 @@
 import datetime
-from typing import Optional
 
 from app.core.exceptions import ResourceNotFoundException
 from app.infrastructure.interfaces.glucose_service_interface import IGlucoseService
@@ -21,22 +20,7 @@ class InsulinServiceImpl(IInsulinService):
             raise ResourceNotFoundException("There is no insulin type in the system")
         return insulin_types
 
-    def _get_glucose_value_at_time(self, user_id: str, timestamp: datetime) -> Optional[int]:
-        start_time = timestamp - datetime.timedelta(minutes=15)
-        end_time = timestamp + datetime.timedelta(minutes=15)
 
-        try:
-            readings = self._glucose_service.get_glucose_by_time_interval(
-                user_id=user_id,
-                start=start_time,
-                end=end_time
-            )
-
-            closest_reading = min(readings, key=lambda r: abs((r.timestamp - timestamp).total_seconds()))
-            return closest_reading.value
-
-        except ResourceNotFoundException:
-            return None
 
     def get_insulin_history_by_time_interval(self, start_time: datetime, end_time: datetime, user_id: str):
         history = self._repo.get_insulin_history_by_time_interval(start_time=start_time, end_time=end_time, user_id=user_id)
@@ -51,6 +35,6 @@ class InsulinServiceImpl(IInsulinService):
 
     def enter_insulin_dose(self, user_id: str, insulin_id: int, dose: float, timestamp: datetime):
         insulin = Insulin(id=insulin_id)
-        glucose_value = self._get_glucose_value_at_time(user_id, timestamp)
+        glucose_value = self._glucose_service.get_glucose_value_at_time(user_id, timestamp)
         dose = InsulinDose(user_id=user_id, insulin_type=insulin, dose=dose, timestamp=timestamp, glucose_value=glucose_value)
         return self._repo.enter_insulin_dose(dose)

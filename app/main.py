@@ -2,8 +2,8 @@ from contextlib import asynccontextmanager
 import uvicorn
 from starlette.responses import JSONResponse
 
-from app.api.routers import glucose_router, insulin_router
-from app.core.dependencies import get_glucose_service, get_insulin_service
+from app.api.routers import glucose_router, insulin_router, meal_router
+from app.core.dependencies import get_glucose_service, get_insulin_service, get_meal_service
 from app.core.exceptions import ResourceNotFoundException, DatabaseError
 from app.infrastructure.persistence.entities import glucose_orm
 from app.infrastructure.persistence.entities import insulin_orm
@@ -17,6 +17,7 @@ from app.services.push_glucose_to_sse import push_glucose_to_sse
 def _init_services():
     get_glucose_service()
     get_insulin_service()
+    get_meal_service()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -35,6 +36,7 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(lifespan=lifespan)
 app.include_router(glucose_router.router)
 app.include_router(insulin_router.router)
+app.include_router(meal_router.router)
 
 @app.exception_handler(ResourceNotFoundException)
 async def resource_not_found_handler(request: Request, exc: ResourceNotFoundException):

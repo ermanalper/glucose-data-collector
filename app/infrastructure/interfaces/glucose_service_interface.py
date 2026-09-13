@@ -1,3 +1,4 @@
+import datetime
 from abc import ABC, abstractmethod
 from typing import Optional, AsyncGenerator
 
@@ -23,4 +24,8 @@ class IGlucoseService(ABC):
 
     @abstractmethod
     def subscribe_to_glucose_stream(self) -> AsyncGenerator[dict, None]:
+        pass
+
+    @abstractmethod
+    def get_glucose_value_at_time(self, user_id: str, timestamp: datetime) -> Optional[int]:
         pass

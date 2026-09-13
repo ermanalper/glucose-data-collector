@@ -12,13 +12,17 @@ from app.infrastructure.interfaces.glucose_repository_interface import IGlucoseR
 from app.infrastructure.interfaces.glucose_service_interface import IGlucoseService
 from app.infrastructure.interfaces.insulin_repository_interface import IInsulinRepository
 from app.infrastructure.interfaces.insulin_service_interface import IInsulinService
+from app.infrastructure.interfaces.meal_repository_interface import IMealRepository
+from app.infrastructure.interfaces.meal_service_interface import IMealService
 from app.infrastructure.interfaces.serializer_interface import ISerializer
 from app.infrastructure.interfaces.sse_broadcaster_interface import ISSEBroadcaster
 from app.infrastructure.persistence.repositories.glucose_repository import SqlAlchemyGlucoseRepository
 from app.infrastructure.persistence.repositories.insulin_repository import SqlAlchemyInsulinRepository
+from app.infrastructure.persistence.repositories.meal_repository import MealRepositoryImpl
 from app.infrastructure.serializers.json_serializer import JsonSerializer
 from app.services.glucose_service import GlucoseServiceImpl
 from app.services.insulin_service import InsulinServiceImpl
+from app.services.meal_service import MealServiceImpl
 
 _glucose_provider_instance = None # Singleton instance
 _glucose_repository_instance = None # Singleton instance
@@ -27,6 +31,8 @@ _serializer_instance = None
 _insulin_repository_instance = None
 _glucose_service_instance = None
 _insulin_service_instance = None
+_meal_service_instance = None
+_meal_repository_instance = None
 
 def get_glucose_provider() -> IGlucoseProvider:
     global _glucose_provider_instance
@@ -101,3 +107,18 @@ def get_insulin_service() -> IInsulinService:
             insulin_repo=get_insulin_repository(),
             glucose_service=get_glucose_service())
     return _insulin_service_instance
+
+def get_meal_repository() -> IMealRepository:
+    global _meal_repository_instance
+    if _meal_repository_instance is None:
+        _meal_repository_instance = MealRepositoryImpl()
+    return _meal_repository_instance
+
+def get_meal_service() -> IMealService:
+    global _meal_service_instance
+    if _meal_service_instance is None:
+        _meal_service_instance = MealServiceImpl(
+            repo=get_meal_repository(),
+            glucose_service=get_glucose_service()
+        )
+    return _meal_service_instance

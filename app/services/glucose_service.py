@@ -22,6 +22,24 @@ class GlucoseServiceImpl(IGlucoseService):
         self._provider = provider
         timer_ticked_event.connect(self.sync_latest_dexcom_data)
 
+    def get_glucose_value_at_time(self, user_id: str, timestamp: datetime) -> Optional[int]:
+        start_time = timestamp - datetime.timedelta(minutes=15)
+        end_time = timestamp + datetime.timedelta(minutes=15)
+
+        try:
+            readings = self.get_glucose_by_time_interval(
+                user_id=user_id,
+                start=start_time,
+                end=end_time
+            )
+
+            closest_reading = min(readings, key=lambda r: abs((r.timestamp - timestamp).total_seconds()))
+            return closest_reading.value
+
+        except ResourceNotFoundException:
+            return None
+
+
     def subscribe_to_glucose_stream(self) -> AsyncGenerator[dict, None]:
         return self._broadcaster.subscribe()
 

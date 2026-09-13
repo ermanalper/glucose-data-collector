@@ -8,3 +8,12 @@ class MealRequest(BaseModel):
 class MealShortcutRequest(BaseModel):
     title: str = Field(..., description="Title of the meal")
     desc: str = Field(..., description="Description of the meal")
+
+class MealResponse(BaseModel):
+    id: int
+    desc: str
+    timestamp: datetime
+
+class MealShortcutResponse(BaseModel):
+    title: str
+    desc: str

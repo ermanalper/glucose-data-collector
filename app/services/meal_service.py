@@ -1,4 +1,5 @@
 import datetime
+from typing import List
 
 from app.infrastructure.interfaces.glucose_service_interface import IGlucoseService
 from app.infrastructure.interfaces.meal_repository_interface import IMealRepository
@@ -17,7 +18,10 @@ class MealServiceImpl(IMealService):
         meal = Meal(user_id=user_id, desc=desc, timestamp=timestamp, glucose_value=glucose_val)
         self._repo.save_meal(meal)
 
-
     def save_meal_shortcut(self, user_id: str, title: str, desc: str):
         meal_shortcut = MealShortcut(user_id=user_id, title=title, desc=desc)
         self._repo.save_meal_shortcut(meal_shortcut)
+
+
+    def get_meal_shortcuts(self, user_id: str) -> List[MealShortcut]:
+        return self._repo.get_meal_shortcuts(user_id)

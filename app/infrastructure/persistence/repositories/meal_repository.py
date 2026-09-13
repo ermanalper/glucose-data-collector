@@ -1,3 +1,5 @@
+from typing import List
+
 from sqlalchemy.exc import IntegrityError
 
 from app.core.exceptions import DatabaseError
@@ -52,3 +54,21 @@ class MealRepositoryImpl(IMealRepository):
             except Exception as e:
                 session.rollback()
                 raise DatabaseError(message=f"Unknown database error: {str(e)}")
+
+    def get_meal_shortcuts(self, user_id: str) -> List[MealShortcut]:
+        with SessionLocal() as session:
+            entities = session.query(MealShortcutEntity) \
+                .filter(MealShortcutEntity.user_id == user_id) \
+                .all()
+
+            return [
+                MealShortcut(
+                    user_id=entity.user_id,
+                    title=entity.title,
+                    desc=entity.desc
+                )
+                for entity in entities
+            ]
+
+
+

@@ -1,8 +1,9 @@
+from datetime import datetime, timezone
 from typing import List
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 
-from app.api.schemas.meal_schema import MealRequest, MealShortcutRequest, MealShortcutResponse
+from app.api.schemas.meal_schema import MealRequest, MealShortcutRequest, MealShortcutResponse, MealResponse
 from app.core.dependencies import get_current_user_id, get_meal_service
 from app.infrastructure.interfaces.meal_service_interface import IMealService
 
@@ -43,4 +44,21 @@ async def get_meal_shortcuts(
             desc=shortcut.desc
         )
         for shortcut in meal_shortcuts
+    ]
+
+@router.get("/history/by-time", response_model=List[MealResponse])
+async def get_meal_history_by_time_interval(
+        start_time: datetime = Query(..., description="Start time (e.g.: 2026-08-28T10:00:00)"),
+        end_time: datetime = Query(default_factory=lambda: datetime.now(timezone.utc),
+                                   description="End time (Default: UTC now)"),
+        user_id: str = Depends(get_current_user_id),
+        service: IMealService = Depends(get_meal_service)
+):
+    meal_history = service.get_meal_history_by_time(user_id, start_time, end_time)
+    return [
+        MealResponse(
+            desc=meal.desc,
+            timestamp=meal.timestamp,
+            glucose_value=meal.glucose_value
+        ) for meal in meal_history
     ]

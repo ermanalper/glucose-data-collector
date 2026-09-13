@@ -1,3 +1,4 @@
+import datetime
 from typing import List
 
 from sqlalchemy.exc import IntegrityError
@@ -69,6 +70,29 @@ class MealRepositoryImpl(IMealRepository):
                 )
                 for entity in entities
             ]
+
+    def get_meal_history_by_time_interval(self, start_time: datetime, end_time: datetime, user_id: str) -> List[Meal]:
+        if start_time.tzinfo is None:
+            start_time = start_time.replace(tzinfo=datetime.timezone.utc)
+        if end_time.tzinfo is None:
+            end_time = end_time.replace(tzinfo=datetime.timezone.utc)
+
+        with SessionLocal() as session:
+            entities = session.query(MealEntity) \
+                .filter(MealEntity.user_id == user_id) \
+                .filter(MealEntity.timestamp >= start_time) \
+                .filter(MealEntity.timestamp <= end_time) \
+                .order_by(MealEntity.timestamp.desc()) \
+                .all()
+        return [
+            Meal(
+                user_id=entity.user_id,
+                timestamp=entity.timestamp,
+                desc=entity.desc,
+                glucose_value=entity.glucose_value
+            )
+            for entity in entities
+        ]
 
 
 

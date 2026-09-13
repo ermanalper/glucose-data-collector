@@ -10,9 +10,9 @@ class MealShortcutRequest(BaseModel):
     desc: str = Field(..., description="Description of the meal")
 
 class MealResponse(BaseModel):
-    id: int
     desc: str
     timestamp: datetime
+    glucose_value: int
 
 class MealShortcutResponse(BaseModel):
     title: str

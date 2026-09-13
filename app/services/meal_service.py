@@ -1,6 +1,7 @@
 import datetime
 from typing import List
 
+from app.core.exceptions import ResourceNotFoundException
 from app.infrastructure.interfaces.glucose_service_interface import IGlucoseService
 from app.infrastructure.interfaces.meal_repository_interface import IMealRepository
 from app.infrastructure.interfaces.meal_service_interface import IMealService
@@ -22,6 +23,13 @@ class MealServiceImpl(IMealService):
         meal_shortcut = MealShortcut(user_id=user_id, title=title, desc=desc)
         self._repo.save_meal_shortcut(meal_shortcut)
 
-
     def get_meal_shortcuts(self, user_id: str) -> List[MealShortcut]:
         return self._repo.get_meal_shortcuts(user_id)
+
+
+    def get_meal_history_by_time(self, user_id: str, start_time: datetime, end_time: datetime) -> List[Meal]:
+        history = self._repo.get_meal_history_by_time_interval(start_time=start_time, end_time=end_time,
+                                                                  user_id=user_id)
+        if not history:
+            raise ResourceNotFoundException("No meal data found for this time interval'.")
+        return history

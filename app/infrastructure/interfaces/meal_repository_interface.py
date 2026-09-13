@@ -1,3 +1,4 @@
+import datetime
 from abc import ABC, abstractmethod
 from typing import List
 
@@ -16,4 +17,8 @@ class IMealRepository(ABC):
 
     @abstractmethod
     def get_meal_shortcuts(self, user_id: str) -> List[MealShortcut]:
+        pass
+
+    @abstractmethod
+    def get_meal_history_by_time_interval(self, start_time: datetime, end_time: datetime, user_id: str) -> List[Meal]:
         pass

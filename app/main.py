@@ -9,7 +9,6 @@ from app.infrastructure.persistence.entities import glucose_orm
 from app.infrastructure.persistence.entities import insulin_orm
 from fastapi import FastAPI, Request
 import app.services.glucose_service
-import app.services.storage_service
 from app.infrastructure.persistence.database import Base, engine
 from app.services.scheduler import start_scheduler
 from app.services.push_glucose_to_sse import push_glucose_to_sse

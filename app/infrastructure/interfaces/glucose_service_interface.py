@@ -29,3 +29,11 @@ class IGlucoseService(ABC):
     @abstractmethod
     def get_glucose_value_at_time(self, user_id: str, timestamp: datetime) -> Optional[int]:
         pass
+
+    @abstractmethod
+    def save_glucose_data(self, sender, glucose_data: Glucose):
+        pass
+
+    @abstractmethod
+    def handle_incoming_webhook(self, payload: dict):
+        pass

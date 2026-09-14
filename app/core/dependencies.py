@@ -6,6 +6,7 @@ from app.core.config import IS_DEVELOPMENT, settings, NIGHTSCOUT_DOCKER_URL
 from app.infrastructure.broadcasters.memory_sse_broadcaster import MemorySSEBroadcaster
 from app.infrastructure.clients.dexcom_client import DexcomShareClient
 from app.infrastructure.clients.nightscout_client import NightscoutClient
+from app.infrastructure.clients.push_client import PushClient
 from app.infrastructure.clients.simulation_client import SimulationClient
 from app.infrastructure.interfaces.glucose_provider_interface import IGlucoseProvider
 from app.infrastructure.interfaces.glucose_repository_interface import IGlucoseRepository
@@ -41,7 +42,8 @@ def get_glucose_provider() -> IGlucoseProvider:
         if IS_DEVELOPMENT:
             current_dir = Path(__file__).resolve().parent
             mock_file_path = current_dir.parent.parent / "data" / "mock" / "simulation_data.json"
-            _glucose_provider_instance = SimulationClient(str(mock_file_path))
+            _glucose_provider_instance = PushClient()
+           # _glucose_provider_instance = SimulationClient(str(mock_file_path))
            # _glucose_provider_instance = NightscoutClient(base_url=NIGHTSCOUT_DOCKER_URL ,raw_api_secret=settings.nightscout_docker_api_secret)
 
             print('Development, provider: ', _glucose_provider_instance)

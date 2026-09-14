@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
-from fastapi import Query
-from app.api.schemas.glucose_schema import GlucoseResponse
+from fastapi import Query, HTTPException
+from app.api.schemas.glucose_schema import GlucoseResponse, PushGlucosePayload
 from app.api.schemas.timestamp_schema import TimestampResponse
 from app.core.dependencies import get_current_user_id, get_glucose_service
 from fastapi import APIRouter, Depends, Request
@@ -82,3 +82,16 @@ async def stream_glucose(
     service: IGlucoseService = Depends(get_glucose_service)
 ):
     return EventSourceResponse(service.subscribe_to_glucose_stream())
+
+
+@router.post("/api/glucose/push-client-webhook")
+async def receive_android_reading(
+        payload: PushGlucosePayload,
+        service: IGlucoseService = Depends(get_glucose_service)
+):
+    try:
+        service.handle_incoming_webhook(payload.dict())
+    except NotImplementedError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    return {"status": "success"}

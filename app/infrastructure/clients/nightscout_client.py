@@ -4,6 +4,8 @@ import requests
 from typing import Optional
 
 from app.core.config import NIGHTSCOUT_DOCKER_URL, settings
+from app.core.exceptions import ClientError
+from app.events.events import timer_ticked_event, new_glucose_data_event
 from app.infrastructure.interfaces.glucose_provider_interface import IGlucoseProvider
 from app.models.glucose import Glucose, TrendState
 
@@ -15,8 +17,6 @@ NIGHTSCOUT_TREND_MAP = {
     "FortyFiveDown": TrendState.FORTY_FIVE_DOWN,
     "SingleDown": TrendState.SINGLE_DOWN,
     "DoubleDown": TrendState.DOUBLE_DOWN,
-
-    # Nightscout'ta bazen tamamen büyük harf de dönebilir, güvenliğe alalım
     "NONE": TrendState.UNKNOWN,
     "NOT COMPUTABLE": TrendState.UNKNOWN,
     "RATE OUT OF RANGE": TrendState.UNKNOWN
@@ -27,11 +27,13 @@ class NightscoutClient(IGlucoseProvider):
         print('Creating Nightscout instance')
         self._base_url = NIGHTSCOUT_DOCKER_URL
         self._raw_api_secret = settings.nightscout_docker_api_secret
+        timer_ticked_event.connect(self.fetch_latest_reading)
+
 
     def _get_hashed_secret(self) -> str:
         return hashlib.sha1(self._raw_api_secret.encode('utf-8')).hexdigest()
 
-    def fetch_latest_reading(self) -> Optional[Glucose]:
+    def fetch_latest_reading(self, sender=None, **kwargs):
         try:
             headers = {
                 "API-SECRET": self._get_hashed_secret()
@@ -52,6 +54,7 @@ class NightscoutClient(IGlucoseProvider):
             data = response.json()
 
             if not data or not isinstance(data, list):
+                print('No data')
                 return None
 
             latest = data[0]
@@ -61,7 +64,7 @@ class NightscoutClient(IGlucoseProvider):
 
             mapped_trend = NIGHTSCOUT_TREND_MAP.get(latest.get("direction"), TrendState.UNKNOWN)
 
-            return Glucose(
+            glucose_obj = Glucose(
                 value=latest.get("sgv"),
                 timestamp=dt_object,
                 trend=mapped_trend,
@@ -73,6 +76,7 @@ class NightscoutClient(IGlucoseProvider):
                     "utc_offset": latest.get("utcOffset")
                 }
             )
+            new_glucose_data_event.send(self, glucose_data=glucose_obj)
         except Exception as e:
             print(f"Nightscout API Error: {e}")
-            return None
+            raise ClientError(f'{e}')

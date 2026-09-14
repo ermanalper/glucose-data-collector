@@ -17,3 +17,15 @@ class DuplicateEntiresException(Exception):
 class DatabaseError(Exception):
     def __init__(self, message: str):
         self.message = message
+
+class TypeMismatchException(Exception):
+    def __init__(self, message: str):
+        self.message = message
+
+class ClientError(Exception):
+    def __init__(self, message: str):
+        self.message = message
+
+class AmbiguousFunctionCallException(Exception):
+    def __init__(self, message: str):
+        self.message = message

@@ -11,3 +11,7 @@ class GlucoseResponse(BaseModel):
     # auto read orm objects (pydantic v2 setting)
     model_config = {"from_attributes": True}
 
+class PushGlucosePayload(BaseModel):
+    value: int
+    trend_symbol: str
+    timestamp_ms: int

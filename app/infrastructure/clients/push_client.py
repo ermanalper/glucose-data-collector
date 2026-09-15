@@ -22,12 +22,23 @@ TREND_MAP = {
     "↘": TrendState.FORTY_FIVE_DOWN,
     "↓": TrendState.SINGLE_DOWN,
     "↓↓": TrendState.DOUBLE_DOWN,
+
     "Steady": TrendState.FLAT,
-    "Flat": TrendState.FLAT,
+    "Slowly Rising": TrendState.FORTY_FIVE_UP,
     "Rising": TrendState.SINGLE_UP,
+    "Rapidly Rising": TrendState.DOUBLE_UP,
+    "Slowly Falling": TrendState.FORTY_FIVE_DOWN,
+    "Falling": TrendState.SINGLE_DOWN,
+    "Rapidly Falling": TrendState.DOUBLE_DOWN,
+
+    "Rising Slowly": TrendState.FORTY_FIVE_UP,
+    "Rising Rapidly": TrendState.DOUBLE_UP,
+    "Falling Slowly": TrendState.FORTY_FIVE_DOWN,
+    "Falling Rapidly": TrendState.DOUBLE_DOWN,
+
+    "Flat": TrendState.FLAT,
     "Rising slightly": TrendState.FORTY_FIVE_UP,
     "Rising rapidly": TrendState.DOUBLE_UP,
-    "Falling": TrendState.SINGLE_DOWN,
     "Falling slightly": TrendState.FORTY_FIVE_DOWN,
     "Falling rapidly": TrendState.DOUBLE_DOWN
 }

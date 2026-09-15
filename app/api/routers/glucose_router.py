@@ -84,7 +84,7 @@ async def stream_glucose(
     return EventSourceResponse(service.subscribe_to_glucose_stream())
 
 
-@router.post("/api/glucose/push-client-webhook")
+@router.post("/push-client-webhook")
 async def receive_android_reading(
         payload: PushGlucosePayload,
         service: IGlucoseService = Depends(get_glucose_service)

@@ -21,7 +21,15 @@ TREND_MAP = {
     "->": TrendState.FLAT,
     "↘": TrendState.FORTY_FIVE_DOWN,
     "↓": TrendState.SINGLE_DOWN,
-    "↓↓": TrendState.DOUBLE_DOWN
+    "↓↓": TrendState.DOUBLE_DOWN,
+    "Steady": TrendState.FLAT,
+    "Flat": TrendState.FLAT,
+    "Rising": TrendState.SINGLE_UP,
+    "Rising slightly": TrendState.FORTY_FIVE_UP,
+    "Rising rapidly": TrendState.DOUBLE_UP,
+    "Falling": TrendState.SINGLE_DOWN,
+    "Falling slightly": TrendState.FORTY_FIVE_DOWN,
+    "Falling rapidly": TrendState.DOUBLE_DOWN
 }
 
 class PushClient(IGlucoseProvider):

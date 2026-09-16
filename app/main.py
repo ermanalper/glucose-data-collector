@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 import uvicorn
 from starlette.responses import JSONResponse
 
-from app.api.routers import glucose_router, insulin_router, meal_router, stream_router
+from app.api.routers import glucose_router, insulin_router, meal_router, stream_router, alarm_router
 from app.api.security import verify_api_key
 from app.core.dependencies import get_glucose_service, get_insulin_service, get_meal_service, get_alarm_service
 from app.core.exceptions import ResourceNotFoundException, DatabaseError
@@ -47,8 +47,10 @@ app.include_router(meal_router.router)
 app.include_router(glucose_router.router, dependencies=[Depends(verify_api_key)])
 app.include_router(insulin_router.router, dependencies=[Depends(verify_api_key)])
 app.include_router(meal_router.router, dependencies=[Depends(verify_api_key)])
+app.include_router(alarm_router.router, dependencies=[Depends(verify_api_key)])
 
-app.include_router(stream_router.router)
+
+app.include_router(stream_router.router, dependencies=[Depends(verify_api_key)])
 
 @app.exception_handler(ResourceNotFoundException)
 async def resource_not_found_handler(request: Request, exc: ResourceNotFoundException):

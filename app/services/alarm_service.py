@@ -37,4 +37,8 @@ class AlarmServiceImpl(IAlarmService):
         self._repo.set_alarm(alarm)
 
     def reset_alarm(self, alarm_id: UUID):
-        pass
+        self._repo.reset_alarm(alarm_id)
+
+    def get_active_alarms(self, user_id: str):
+        active_alarms = self._repo.get_active_alarms(user_id)
+        return active_alarms

@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import List
 from uuid import UUID
 
 from app.models.alarm import Alarm
@@ -16,4 +17,8 @@ class IAlarmService(ABC):
 
     @abstractmethod
     def _handle_new_glucose_data(self, sender, glucose_data: Glucose, **kwargs):
+        pass
+
+    @abstractmethod
+    def get_active_alarms(self, user_id: str) -> List[Alarm]:
         pass

@@ -22,8 +22,8 @@ class AlarmRepositoryImpl(IAlarmRepository):
                 if db_entity is None:
                     raise DatabaseError(message="Alarm not found.")
 
-                if db_entity.is_active:
-                    raise AlarmAlreadyActiveException(message="Alarm is already active")
+                if not db_entity.is_active:
+                    raise AlarmAlreadyActiveException(message="Alarm is already acknowledged")
 
                 db_entity.is_active = False
                 session.commit()
@@ -70,3 +70,19 @@ class AlarmRepositoryImpl(IAlarmRepository):
             except Exception as e:
                 session.rollback()
                 raise DatabaseError(message=f"Unknown database error: {str(e)}")
+
+    def get_active_alarms(self, user_id: str):
+        with SessionLocal() as session:
+            entities = session.query(AlarmEntity) \
+                .filter(AlarmEntity.user_id == user_id,
+                         AlarmEntity.is_active) \
+                .all()
+            return [
+                Alarm(
+                    id=entity.id,
+                    level=entity.level,
+                    message=entity.message,
+                    timestamp=entity.timestamp
+                )
+                for entity in entities
+            ]

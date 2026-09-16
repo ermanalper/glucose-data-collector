@@ -35,6 +35,8 @@ _insulin_service_instance = None
 _meal_service_instance = None
 _meal_repository_instance = None
 
+
+
 def get_glucose_provider() -> IGlucoseProvider:
     global _glucose_provider_instance
     #singleton pattern
@@ -124,3 +126,4 @@ def get_meal_service() -> IMealService:
             glucose_service=get_glucose_service()
         )
     return _meal_service_instance
+

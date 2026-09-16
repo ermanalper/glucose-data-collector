@@ -3,11 +3,12 @@ import uvicorn
 from starlette.responses import JSONResponse
 
 from app.api.routers import glucose_router, insulin_router, meal_router
+from app.api.security import verify_api_key
 from app.core.dependencies import get_glucose_service, get_insulin_service, get_meal_service
 from app.core.exceptions import ResourceNotFoundException, DatabaseError
 from app.infrastructure.persistence.entities import glucose_orm
 from app.infrastructure.persistence.entities import insulin_orm
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends
 import app.services.glucose_service
 from app.infrastructure.persistence.database import Base, engine
 from app.services.scheduler import start_scheduler
@@ -33,9 +34,18 @@ async def lifespan(app: FastAPI):
 
 Base.metadata.create_all(bind=engine)
 app = FastAPI(lifespan=lifespan)
+
+'''
+If you don't want to add an API secret key to your backend, you may use the following router
+initializations
 app.include_router(glucose_router.router)
 app.include_router(insulin_router.router)
 app.include_router(meal_router.router)
+'''
+app.include_router(glucose_router.router, dependencies=[Depends(verify_api_key)])
+app.include_router(insulin_router.router, dependencies=[Depends(verify_api_key)])
+app.include_router(meal_router.router, dependencies=[Depends(verify_api_key)])
+
 
 @app.exception_handler(ResourceNotFoundException)
 async def resource_not_found_handler(request: Request, exc: ResourceNotFoundException):

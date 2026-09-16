@@ -17,8 +17,7 @@ i.e. If a pull client is being used, the backend will raise an error when the we
 
 from datetime import datetime
 
-from app.events.events import new_glucose_data_event
-from app.infrastructure.interfaces.glucose_provider_interface import IGlucoseProvider, IPushClient
+from app.infrastructure.interfaces.glucose.glucose_provider_interface import IPushClient
 from app.models.glucose import TrendState, Glucose
 
 TREND_MAP = {

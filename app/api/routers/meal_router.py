@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, Query
 
 from app.api.schemas.meal_schema import MealRequest, MealShortcutRequest, MealShortcutResponse, MealResponse
 from app.core.dependencies import get_current_user_id, get_meal_service
-from app.infrastructure.interfaces.meal_service_interface import IMealService
+from app.infrastructure.interfaces.meals.meal_service_interface import IMealService
 
 router = APIRouter(prefix="/api/v1/meal", tags=["Meal Data"])
 

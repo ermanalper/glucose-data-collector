@@ -3,8 +3,8 @@ from uuid import UUID
 
 
 from app.events.events import new_glucose_data_event, alarm_triggered_event
-from app.infrastructure.interfaces.alarm_repository_interface import IAlarmRepository
-from app.infrastructure.interfaces.alarm_service_interface import IAlarmService
+from app.infrastructure.interfaces.alarms.alarm_repository_interface import IAlarmRepository
+from app.infrastructure.interfaces.alarms.alarm_service_interface import IAlarmService
 from app.models.alarm import Alarm
 from app.models.glucose import Glucose, GlucoseStatus
 

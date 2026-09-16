@@ -1,22 +1,17 @@
 from pathlib import Path
 
-from fastapi import Depends
-
-from app.core.config import IS_DEVELOPMENT, settings, NIGHTSCOUT_DOCKER_URL
+from app.core.config import IS_DEVELOPMENT
 from app.infrastructure.broadcasters.memory_sse_broadcaster import MemorySSEBroadcaster
-from app.infrastructure.clients.dexcom_client import DexcomShareClient
-from app.infrastructure.clients.nightscout_client import NightscoutClient
 from app.infrastructure.clients.push_client import PushClient
-from app.infrastructure.clients.simulation_client import SimulationClient
-from app.infrastructure.interfaces.alarm_repository_interface import IAlarmRepository
-from app.infrastructure.interfaces.alarm_service_interface import IAlarmService
-from app.infrastructure.interfaces.glucose_provider_interface import IGlucoseProvider
-from app.infrastructure.interfaces.glucose_repository_interface import IGlucoseRepository
-from app.infrastructure.interfaces.glucose_service_interface import IGlucoseService
-from app.infrastructure.interfaces.insulin_repository_interface import IInsulinRepository
-from app.infrastructure.interfaces.insulin_service_interface import IInsulinService
-from app.infrastructure.interfaces.meal_repository_interface import IMealRepository
-from app.infrastructure.interfaces.meal_service_interface import IMealService
+from app.infrastructure.interfaces.alarms.alarm_repository_interface import IAlarmRepository
+from app.infrastructure.interfaces.alarms.alarm_service_interface import IAlarmService
+from app.infrastructure.interfaces.glucose.glucose_provider_interface import IGlucoseProvider
+from app.infrastructure.interfaces.glucose.glucose_repository_interface import IGlucoseRepository
+from app.infrastructure.interfaces.glucose.glucose_service_interface import IGlucoseService
+from app.infrastructure.interfaces.insulin.insulin_repository_interface import IInsulinRepository
+from app.infrastructure.interfaces.insulin.insulin_service_interface import IInsulinService
+from app.infrastructure.interfaces.meals.meal_repository_interface import IMealRepository
+from app.infrastructure.interfaces.meals.meal_service_interface import IMealService
 from app.infrastructure.interfaces.serializer_interface import ISerializer
 from app.infrastructure.interfaces.sse_broadcaster_interface import ISSEBroadcaster
 from app.infrastructure.persistence.repositories.alarm_repository import AlarmRepositoryImpl

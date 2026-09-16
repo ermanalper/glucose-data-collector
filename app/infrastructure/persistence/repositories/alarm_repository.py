@@ -3,7 +3,7 @@ from uuid import UUID
 from sqlalchemy.exc import IntegrityError
 
 from app.core.exceptions import DatabaseError, AlarmAlreadyActiveException, MissingArgumentException
-from app.infrastructure.interfaces.alarm_repository_interface import IAlarmRepository
+from app.infrastructure.interfaces.alarms.alarm_repository_interface import IAlarmRepository
 from app.infrastructure.persistence.database import SessionLocal
 from app.infrastructure.persistence.entities.alarm_orm import AlarmEntity
 from app.models.alarm import Alarm

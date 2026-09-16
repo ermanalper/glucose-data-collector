@@ -5,11 +5,10 @@ import datetime
 from app.api.schemas.glucose_schema import PushGlucosePayload
 from app.core.exceptions import ResourceNotFoundException, FalseClientException
 from app.events.events import timer_ticked_event, new_glucose_data_event
-from app.infrastructure.interfaces.glucose_provider_interface import IGlucoseProvider, IPullClient, IPushClient
-from app.infrastructure.interfaces.glucose_repository_interface import IGlucoseRepository
-from app.infrastructure.interfaces.glucose_service_interface import IGlucoseService
+from app.infrastructure.interfaces.glucose.glucose_provider_interface import IGlucoseProvider, IPullClient, IPushClient
+from app.infrastructure.interfaces.glucose.glucose_repository_interface import IGlucoseRepository
+from app.infrastructure.interfaces.glucose.glucose_service_interface import IGlucoseService
 from app.infrastructure.interfaces.sse_broadcaster_interface import ISSEBroadcaster
-from app.models import glucose
 from app.models.glucose import Glucose
 
 class GlucoseServiceImpl(IGlucoseService):

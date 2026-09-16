@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, Query
 from app.api.schemas.insulin_dose_schema import InsulinDoseResponse, InsulinDoseRequest
 from app.api.schemas.insulin_schema import InsulinResponse
 from app.core.dependencies import get_current_user_id, get_insulin_service
-from app.infrastructure.interfaces.insulin_service_interface import IInsulinService
+from app.infrastructure.interfaces.insulin.insulin_service_interface import IInsulinService
 
 
 router = APIRouter(prefix="/api/v1/insulin", tags=["Insulin Data"])

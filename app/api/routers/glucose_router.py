@@ -3,11 +3,10 @@ from fastapi import Query, HTTPException
 from app.api.schemas.glucose_schema import GlucoseResponse, PushGlucosePayload
 from app.api.schemas.timestamp_schema import TimestampResponse
 from app.core.dependencies import get_current_user_id, get_glucose_service
-from fastapi import APIRouter, Depends, Request
-from sse_starlette.sse import EventSourceResponse
+from fastapi import APIRouter, Depends
 
 from app.core.exceptions import FalseClientException
-from app.infrastructure.interfaces.glucose_service_interface import IGlucoseService
+from app.infrastructure.interfaces.glucose.glucose_service_interface import IGlucoseService
 router = APIRouter(prefix="/api/v1/glucose", tags=["Glucose Data"])
 
 

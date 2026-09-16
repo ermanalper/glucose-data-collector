@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends
 
 from app.api.schemas.alarm_schema import AlarmResponse, AlarmRequest
 from app.core.dependencies import get_current_user_id, get_alarm_service
-from app.infrastructure.interfaces.alarm_service_interface import IAlarmService
+from app.infrastructure.interfaces.alarms.alarm_service_interface import IAlarmService
 
 router = APIRouter(prefix="/api/v1/alarm", tags=["Alarm Data"])
 

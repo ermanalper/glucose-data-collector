@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from typing import Optional
 
 from app.core.exceptions import MissingArgumentException, ResourceNotFoundException
-from app.infrastructure.interfaces.glucose_repository_interface import IGlucoseRepository
+from app.infrastructure.interfaces.glucose.glucose_repository_interface import IGlucoseRepository
 from app.models.glucose import Glucose, TrendState
 from app.infrastructure.persistence.database import SessionLocal
 from app.infrastructure.persistence.entities.glucose_orm import GlucoseEntity

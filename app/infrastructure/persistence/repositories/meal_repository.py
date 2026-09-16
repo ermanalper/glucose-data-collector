@@ -4,7 +4,7 @@ from typing import List
 from sqlalchemy.exc import IntegrityError
 
 from app.core.exceptions import DatabaseError
-from app.infrastructure.interfaces.meal_repository_interface import IMealRepository
+from app.infrastructure.interfaces.meals.meal_repository_interface import IMealRepository
 from app.infrastructure.persistence.database import SessionLocal
 from app.infrastructure.persistence.entities.meal_orm import MealEntity
 from app.infrastructure.persistence.entities.meal_shortcut_orm import MealShortcutEntity

@@ -2,9 +2,9 @@ import datetime
 from typing import List
 
 from app.core.exceptions import ResourceNotFoundException
-from app.infrastructure.interfaces.glucose_service_interface import IGlucoseService
-from app.infrastructure.interfaces.meal_repository_interface import IMealRepository
-from app.infrastructure.interfaces.meal_service_interface import IMealService
+from app.infrastructure.interfaces.glucose.glucose_service_interface import IGlucoseService
+from app.infrastructure.interfaces.meals.meal_repository_interface import IMealRepository
+from app.infrastructure.interfaces.meals.meal_service_interface import IMealService
 from app.models.meal import Meal
 from app.models.meal_shortcut import MealShortcut
 

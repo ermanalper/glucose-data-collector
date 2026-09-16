@@ -1,11 +1,7 @@
-from typing import Optional
 from pydexcom import Dexcom, Region
 
-
-from app.core.config import settings
 from app.core.exceptions import ClientError
-from app.events.events import timer_ticked_event, new_glucose_data_event
-from app.infrastructure.interfaces.glucose_provider_interface import IGlucoseProvider, IPullClient
+from app.infrastructure.interfaces.glucose.glucose_provider_interface import IPullClient
 from app.models.glucose import Glucose, TrendState
 
 DEXCOM_TREND_MAP = {

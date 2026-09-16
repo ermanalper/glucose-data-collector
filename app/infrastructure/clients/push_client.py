@@ -15,7 +15,7 @@ from the database. But the real reason behind Push Clients is to avoid ambiguous
 i.e. If a pull client is being used, the backend will raise an error when the webhook is used 
 '''
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.infrastructure.interfaces.glucose.glucose_provider_interface import IPushClient
 from app.models.glucose import TrendState, Glucose
@@ -52,13 +52,12 @@ TREND_MAP = {
 class PushClient(IPushClient):
     def __init__(self, user_id:str="default_user"):
         self._user_id = user_id
-    def process_pushed_data(self, value: int, trend_symbol: str, timestamp_ms: int, **kwargs):
-        dt_object = datetime.fromtimestamp(timestamp_ms / 1000.0)
+    def process_pushed_data(self, value: int, trend_symbol: str, **kwargs):
         mapped_trend = TREND_MAP.get(trend_symbol, TrendState.UNKNOWN)
 
         glucose_obj = Glucose(
             value=value,
-            timestamp=dt_object,
+            timestamp=datetime.now(timezone.utc),
             trend=mapped_trend,
             source="Push_Client",
             raw_metadata={"original_symbol": trend_symbol},

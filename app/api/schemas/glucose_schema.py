@@ -14,4 +14,3 @@ class GlucoseResponse(BaseModel):
 class PushGlucosePayload(BaseModel):
     value: int
     trend_symbol: str
-    timestamp_ms: int

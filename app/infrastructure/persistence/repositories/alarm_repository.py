@@ -52,12 +52,6 @@ class AlarmRepositoryImpl(IAlarmRepository):
                 session.add(db_entity)
                 session.commit()
             except IntegrityError as e:
-                # --- GERÇEK HATAYI BURADA YAZDIRALIM ---
-                print(f"--- DATABASE INTEGRITY ERROR DETAYI ---")
-                print(f"Original Exception: {e.orig}")
-                print(f"Statement: {e.statement}")
-                print(f"Parameters: {e.params}")
-                print(f"--------------------------------------")
                 session.rollback()
                 error_str = str(e.orig)
 

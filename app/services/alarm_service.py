@@ -26,8 +26,8 @@ class AlarmServiceImpl(IAlarmService):
                 msg = "CRITICAL ALARM"
                 lvl = 2
             self.set_alarm(user_id=glucose_data.user_id, message=msg, level=lvl)
-
-        print('Everything is normal')
+        else:
+            print('Everything is normal')
 
     # usually this should be a private function because alarms are not set manually, but automatically
     # but for test concerns, this can be called from an endpoint

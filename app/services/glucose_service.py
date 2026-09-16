@@ -1,7 +1,7 @@
 from typing import Optional, AsyncGenerator
 
+from datetime import datetime
 import datetime
-
 from app.api.schemas.glucose_schema import PushGlucosePayload
 from app.core.exceptions import ResourceNotFoundException, FalseClientException
 from app.events.events import timer_ticked_event, new_glucose_data_event
@@ -77,8 +77,7 @@ class GlucoseServiceImpl(IGlucoseService):
         if isinstance(self._provider, IPushClient):
             glucose_data = self._provider.process_pushed_data(
                 value=payload.value,
-                trend_symbol=payload.trend_symbol,
-                timestamp_ms=payload.timestamp_ms
+                trend_symbol=payload.trend_symbol
             )
             if glucose_data:
                 self._save_and_broadcast(glucose_data)

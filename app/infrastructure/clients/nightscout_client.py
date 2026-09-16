@@ -6,7 +6,7 @@ from typing import Optional
 from app.core.config import NIGHTSCOUT_DOCKER_URL, settings
 from app.core.exceptions import ClientError
 from app.events.events import timer_ticked_event, new_glucose_data_event
-from app.infrastructure.interfaces.glucose_provider_interface import IGlucoseProvider
+from app.infrastructure.interfaces.glucose_provider_interface import IGlucoseProvider, IPullClient
 from app.models.glucose import Glucose, TrendState
 
 NIGHTSCOUT_TREND_MAP = {
@@ -22,12 +22,11 @@ NIGHTSCOUT_TREND_MAP = {
     "RATE OUT OF RANGE": TrendState.UNKNOWN
 }
 
-class NightscoutClient(IGlucoseProvider):
+class NightscoutClient(IPullClient):
     def __init__(self, base_url, raw_api_secret):
         print('Creating Nightscout instance')
         self._base_url = NIGHTSCOUT_DOCKER_URL
         self._raw_api_secret = settings.nightscout_docker_api_secret
-        timer_ticked_event.connect(self.fetch_latest_reading)
 
 
     def _get_hashed_secret(self) -> str:
@@ -76,7 +75,8 @@ class NightscoutClient(IGlucoseProvider):
                     "utc_offset": latest.get("utcOffset")
                 }
             )
-            new_glucose_data_event.send(self, glucose_data=glucose_obj)
+            return glucose_obj
+
         except Exception as e:
             print(f"Nightscout API Error: {e}")
             raise ClientError(f'{e}')

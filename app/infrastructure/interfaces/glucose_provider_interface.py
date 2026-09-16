@@ -1,6 +1,7 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 
 from app.core.exceptions import AmbiguousFunctionCallException
+from app.models.glucose import Glucose
 
 '''
 PULL CLIENTS:
@@ -13,10 +14,18 @@ PUSH CLIENTS:
 '''
 
 class IGlucoseProvider(ABC):
-    def fetch_latest_reading(self, sender=None, **kwargs):
-        raise AmbiguousFunctionCallException("This function can only be used by 'pull clients'. If this exception is raised, then, "
-                                             "it is not overridden in the currently set client (it is a push client)."
-                                             "See the notes at glucose_provider_interface.py for further information")
+   pass
+
+class IPullClient(IGlucoseProvider):
+    @abstractmethod
+    def fetch_latest_reading(self, sender=None, **kwargs) -> Glucose:
+        raise AmbiguousFunctionCallException(
+            "This function can only be used by 'pull clients'. If this exception is raised, then, "
+            "it is not overridden in the currently set client (it is a push client)."
+            "See the notes at glucose_provider_interface.py for further information")
+
+class IPushClient(IGlucoseProvider):
+    @abstractmethod
     def process_pushed_data(self, **kwargs):
         raise AmbiguousFunctionCallException(
             "This function can only be used by 'push clients'. If this exception is raised, then, "

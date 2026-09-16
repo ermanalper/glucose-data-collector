@@ -21,6 +21,8 @@ class Settings(BaseSettings):
     postgres_db: str
     database_url: str
 
+    api_key: str
+
     model_config = SettingsConfigDict(env_file=env_path, env_file_encoding='utf-8', extra='ignore')
 
 

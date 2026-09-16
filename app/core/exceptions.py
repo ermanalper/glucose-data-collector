@@ -29,3 +29,13 @@ class ClientError(Exception):
 class AmbiguousFunctionCallException(Exception):
     def __init__(self, message: str):
         self.message = message
+
+
+class AlarmAlreadyActiveException(Exception):
+    def __init__(self, message: str):
+        self.message = message
+
+class FalseClientException(Exception):
+    def __init__(self, message: str):
+        self.message = message
+

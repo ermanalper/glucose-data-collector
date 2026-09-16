@@ -5,6 +5,8 @@ from app.api.schemas.timestamp_schema import TimestampResponse
 from app.core.dependencies import get_current_user_id, get_glucose_service
 from fastapi import APIRouter, Depends, Request
 from sse_starlette.sse import EventSourceResponse
+
+from app.core.exceptions import FalseClientException
 from app.infrastructure.interfaces.glucose_service_interface import IGlucoseService
 router = APIRouter(prefix="/api/v1/glucose", tags=["Glucose Data"])
 
@@ -85,13 +87,15 @@ async def stream_glucose(
 
 
 @router.post("/push-client-webhook")
-async def receive_android_reading(
+async def receive_push_client_reading(
         payload: PushGlucosePayload,
         service: IGlucoseService = Depends(get_glucose_service)
 ):
     try:
-        service.handle_incoming_webhook(payload.dict())
+        service.handle_incoming_webhook(payload)
     except NotImplementedError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except FalseClientException as e:
         raise HTTPException(status_code=400, detail=str(e))
 
     return {"status": "success"}

@@ -5,7 +5,7 @@ from pydexcom import Dexcom, Region
 from app.core.config import settings
 from app.core.exceptions import ClientError
 from app.events.events import timer_ticked_event, new_glucose_data_event
-from app.infrastructure.interfaces.glucose_provider_interface import IGlucoseProvider
+from app.infrastructure.interfaces.glucose_provider_interface import IGlucoseProvider, IPullClient
 from app.models.glucose import Glucose, TrendState
 
 DEXCOM_TREND_MAP = {
@@ -24,12 +24,11 @@ DEXCOM_TREND_MAP = {
     "RateOutOfRange": TrendState.UNKNOWN
 }
 
-class DexcomShareClient(IGlucoseProvider):
+class DexcomShareClient(IPullClient):
     def __init__(self, username, password):
         # ous=True is required for Europe (including Turkey)
         print('Creating DexcomShare instance')
         self._client = Dexcom(password=password, username=username, region=Region.OUS)
-        timer_ticked_event.connect(self.fetch_latest_reading)
 
     def fetch_latest_reading(self, sender=None, **kwargs):
         print('DexcomShareClient fetch latest reading')
@@ -53,8 +52,7 @@ class DexcomShareClient(IGlucoseProvider):
                 }
             )
 
-            new_glucose_data_event.send(self, glucose_data=glucose_obj)
-
+            return glucose_obj
 
         except Exception as e:
             print(f"Dexcom API Error: {e}")

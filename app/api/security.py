@@ -1,13 +1,14 @@
-import os
 from fastapi import Security, HTTPException, status
 from fastapi.security import APIKeyHeader
+
+from app.core.config import settings
 
 API_KEY_NAME = "X-API-Key"
 api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=True)
 
 
 def verify_api_key(api_key: str = Security(api_key_header)) -> str:
-    expected_api_key = os.getenv("API_KEY")
+    expected_api_key = settings.api_key
 
     if not expected_api_key or api_key != expected_api_key:
         raise HTTPException(

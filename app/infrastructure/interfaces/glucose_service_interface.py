@@ -2,6 +2,7 @@ import datetime
 from abc import ABC, abstractmethod
 from typing import Optional, AsyncGenerator
 
+from app.api.schemas.glucose_schema import PushGlucosePayload
 from app.models.glucose import Glucose
 
 
@@ -31,9 +32,5 @@ class IGlucoseService(ABC):
         pass
 
     @abstractmethod
-    def save_glucose_data(self, sender, glucose_data: Glucose):
-        pass
-
-    @abstractmethod
-    def handle_incoming_webhook(self, payload: dict):
+    def handle_incoming_webhook(self, payload: PushGlucosePayload):
         pass

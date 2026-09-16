@@ -2,9 +2,10 @@ from typing import Optional, AsyncGenerator
 
 import datetime
 
-from app.core.exceptions import ResourceNotFoundException
+from app.api.schemas.glucose_schema import PushGlucosePayload
+from app.core.exceptions import ResourceNotFoundException, FalseClientException
 from app.events.events import timer_ticked_event, new_glucose_data_event
-from app.infrastructure.interfaces.glucose_provider_interface import IGlucoseProvider
+from app.infrastructure.interfaces.glucose_provider_interface import IGlucoseProvider, IPullClient, IPushClient
 from app.infrastructure.interfaces.glucose_repository_interface import IGlucoseRepository
 from app.infrastructure.interfaces.glucose_service_interface import IGlucoseService
 from app.infrastructure.interfaces.sse_broadcaster_interface import ISSEBroadcaster
@@ -20,7 +21,7 @@ class GlucoseServiceImpl(IGlucoseService):
         self._repo = repo
         self._broadcaster = broadcaster
         self._provider = provider
-        new_glucose_data_event.connect(self.save_glucose_data)
+        timer_ticked_event.connect(self._handle_timer_tick)
 
     def get_glucose_value_at_time(self, user_id: str, timestamp: datetime) -> Optional[int]:
         start_time = timestamp - datetime.timedelta(minutes=15)
@@ -64,14 +65,26 @@ class GlucoseServiceImpl(IGlucoseService):
             raise ResourceNotFoundException("No glucose data found for this user.")
         return latest_data
 
-    def save_glucose_data(self, sender, glucose_data: Glucose):
+    def _handle_timer_tick(self, sender=None, **kwargs):
+        # Only pull clients work with timer tick
+        if isinstance(self._provider, IPullClient):
+            glucose_data = self._provider.fetch_latest_reading()
+            if glucose_data:
+                self._save_and_broadcast(glucose_data)
+
+    def handle_incoming_webhook(self, payload: PushGlucosePayload):
+        # Only push clients work with webhook
+        if isinstance(self._provider, IPushClient):
+            glucose_data = self._provider.process_pushed_data(
+                value=payload.value,
+                trend_symbol=payload.trend_symbol,
+                timestamp_ms=payload.timestamp_ms
+            )
+            if glucose_data:
+                self._save_and_broadcast(glucose_data)
+        else:
+            raise FalseClientException("Pull clients do not work with webhook")
+
+    def _save_and_broadcast(self, glucose_data: Glucose):
         print(f"[{datetime.datetime.now()}] [SERVICE] New glucose event caught! Pass it to repo and save.")
         self._repo.save(glucose_data)
-
-    def handle_incoming_webhook(self, payload: dict):
-        self._provider.process_pushed_data(
-            value=payload.get("value"),
-            trend_symbol=payload.get("trend_symbol"),
-            timestamp_ms=payload.get("timestamp_ms")
-        )
-

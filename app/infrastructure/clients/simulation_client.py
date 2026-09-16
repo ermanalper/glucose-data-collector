@@ -1,9 +1,7 @@
 from datetime import datetime, timezone
 import json
-from typing import Optional
 
-from app.events.events import timer_ticked_event, new_glucose_data_event
-from app.infrastructure.interfaces.glucose_provider_interface import IGlucoseProvider
+from app.infrastructure.interfaces.glucose_provider_interface import IGlucoseProvider, IPullClient
 from app.models.glucose import Glucose, TrendState
 
 """
@@ -23,12 +21,11 @@ SIMULATION_TREND_MAP = {
     "DOUBLE_DOWN": TrendState.DOUBLE_DOWN,
 }
 
-class SimulationClient(IGlucoseProvider):
+class SimulationClient(IPullClient):
     def __init__(self, file_path: str):
         self._file_path = file_path
         self._current_index = 0
         self._mock_data = self._load_data()
-        timer_ticked_event.connect(self.fetch_latest_reading)
 
 
     def _load_data(self) -> list:
@@ -51,4 +48,4 @@ class SimulationClient(IGlucoseProvider):
             source=raw_item["source"],
             raw_metadata={"simulated_index": self._current_index}
         )
-        new_glucose_data_event.send(self, glucose_data=glucose_obj)
+        return glucose_obj

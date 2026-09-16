@@ -51,6 +51,8 @@ TREND_MAP = {
 }
 
 class PushClient(IPushClient):
+    def __init__(self, user_id:str="default_user"):
+        self._user_id = user_id
     def process_pushed_data(self, value: int, trend_symbol: str, timestamp_ms: int, **kwargs):
         dt_object = datetime.fromtimestamp(timestamp_ms / 1000.0)
         mapped_trend = TREND_MAP.get(trend_symbol, TrendState.UNKNOWN)
@@ -60,6 +62,7 @@ class PushClient(IPushClient):
             timestamp=dt_object,
             trend=mapped_trend,
             source="Push_Client",
-            raw_metadata={"original_symbol": trend_symbol}
+            raw_metadata={"original_symbol": trend_symbol},
+            user_id=self._user_id
         )
         return glucose_obj

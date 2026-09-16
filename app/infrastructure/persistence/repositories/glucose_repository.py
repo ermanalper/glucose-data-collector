@@ -13,7 +13,7 @@ class SqlAlchemyGlucoseRepository(IGlucoseRepository):
          with SessionLocal() as session:
             try:
                 db_entity = GlucoseEntity(
-                    user_id="default_user",
+                    user_id=glucose.user_id,
                     value=glucose.value,
                     timestamp=glucose.timestamp,
                     trend=glucose.trend.value, #get enum's string value
@@ -61,7 +61,8 @@ class SqlAlchemyGlucoseRepository(IGlucoseRepository):
                     value=entity.value,
                     timestamp=entity.timestamp,
                     trend=TrendState(entity.trend),
-                    source=entity.source
+                    source=entity.source,
+                    user_id=None
                 )
                 for entity in entities
             ]

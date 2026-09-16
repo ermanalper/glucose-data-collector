@@ -38,6 +38,7 @@ class Glucose:
     raw_metadata: Dict[str, Any] = field(default_factory=dict) #for source-specific data
 
     status: GlucoseStatus = field(init=False)
+    user_id: str | None = None
 
     def __post_init__(self):
         self.status = self._calculate_status()

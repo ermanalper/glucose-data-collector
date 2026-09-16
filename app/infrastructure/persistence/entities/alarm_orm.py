@@ -13,6 +13,7 @@ class AlarmEntity(Base):
     timestamp = Column(DateTime(timezone=True), nullable=False, index=True)
     message = Column(String, nullable=False)
     is_active = Column(Boolean, nullable=False)
+    level = Column(Integer, nullable=False)
 
     __table_args__ = (
         UniqueConstraint('user_id', 'timestamp', name='uix_alarm_timestamp'), #timestamps must be unique

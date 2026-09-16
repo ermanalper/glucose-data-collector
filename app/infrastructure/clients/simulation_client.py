@@ -22,10 +22,11 @@ SIMULATION_TREND_MAP = {
 }
 
 class SimulationClient(IPullClient):
-    def __init__(self, file_path: str):
+    def __init__(self, file_path: str, user_id:str="default_user"):
         self._file_path = file_path
         self._current_index = 0
         self._mock_data = self._load_data()
+        self._user_id = user_id
 
 
     def _load_data(self) -> list:
@@ -46,6 +47,7 @@ class SimulationClient(IPullClient):
             timestamp=dt_object,
             trend=mapped_trend,
             source=raw_item["source"],
-            raw_metadata={"simulated_index": self._current_index}
+            raw_metadata={"simulated_index": self._current_index},
+            user_id = self._user_id
         )
         return glucose_obj

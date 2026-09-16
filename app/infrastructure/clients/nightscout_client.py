@@ -23,10 +23,11 @@ NIGHTSCOUT_TREND_MAP = {
 }
 
 class NightscoutClient(IPullClient):
-    def __init__(self, base_url, raw_api_secret):
+    def __init__(self, base_url, raw_api_secret, user_id:str="default_user"):
         print('Creating Nightscout instance')
         self._base_url = NIGHTSCOUT_DOCKER_URL
         self._raw_api_secret = settings.nightscout_docker_api_secret
+        self._user_id = user_id
 
 
     def _get_hashed_secret(self) -> str:
@@ -73,7 +74,8 @@ class NightscoutClient(IPullClient):
                     "device": latest.get("device"),
                     "type": latest.get("type"),
                     "utc_offset": latest.get("utcOffset")
-                }
+                },
+                user_id=self._user_id
             )
             return glucose_obj
 

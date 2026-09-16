@@ -8,6 +8,8 @@ from app.infrastructure.clients.dexcom_client import DexcomShareClient
 from app.infrastructure.clients.nightscout_client import NightscoutClient
 from app.infrastructure.clients.push_client import PushClient
 from app.infrastructure.clients.simulation_client import SimulationClient
+from app.infrastructure.interfaces.alarm_repository_interface import IAlarmRepository
+from app.infrastructure.interfaces.alarm_service_interface import IAlarmService
 from app.infrastructure.interfaces.glucose_provider_interface import IGlucoseProvider
 from app.infrastructure.interfaces.glucose_repository_interface import IGlucoseRepository
 from app.infrastructure.interfaces.glucose_service_interface import IGlucoseService
@@ -17,10 +19,12 @@ from app.infrastructure.interfaces.meal_repository_interface import IMealReposit
 from app.infrastructure.interfaces.meal_service_interface import IMealService
 from app.infrastructure.interfaces.serializer_interface import ISerializer
 from app.infrastructure.interfaces.sse_broadcaster_interface import ISSEBroadcaster
+from app.infrastructure.persistence.repositories.alarm_repository import AlarmRepositoryImpl
 from app.infrastructure.persistence.repositories.glucose_repository import SqlAlchemyGlucoseRepository
 from app.infrastructure.persistence.repositories.insulin_repository import SqlAlchemyInsulinRepository
 from app.infrastructure.persistence.repositories.meal_repository import MealRepositoryImpl
 from app.infrastructure.serializers.json_serializer import JsonSerializer
+from app.services.alarm_service import AlarmServiceImpl
 from app.services.glucose_service import GlucoseServiceImpl
 from app.services.insulin_service import InsulinServiceImpl
 from app.services.meal_service import MealServiceImpl
@@ -34,7 +38,8 @@ _glucose_service_instance = None
 _insulin_service_instance = None
 _meal_service_instance = None
 _meal_repository_instance = None
-
+_alarm_service_instance = None
+_alarm_repository_instance = None
 
 
 def get_glucose_provider() -> IGlucoseProvider:
@@ -126,4 +131,17 @@ def get_meal_service() -> IMealService:
             glucose_service=get_glucose_service()
         )
     return _meal_service_instance
+
+def get_alarm_repository() -> IAlarmRepository:
+    global _alarm_repository_instance
+    if _alarm_repository_instance is None:
+        _alarm_repository_instance = AlarmRepositoryImpl()
+    return _alarm_repository_instance
+
+def get_alarm_service() -> IAlarmService:
+    global _alarm_service_instance
+    if _alarm_service_instance is None:
+        _alarm_service_instance = AlarmServiceImpl(get_alarm_repository())
+    return _alarm_service_instance
+
 

@@ -78,13 +78,6 @@ async def get_first_data_date(
     first_entry_date = service.get_first_glucose_entry_date(current_user_id)
     return TimestampResponse(timestamp=first_entry_date)
 
-@router.get("/stream", description="Glucose data tunnel to frontends")
-async def stream_glucose(
-    request: Request,
-    service: IGlucoseService = Depends(get_glucose_service)
-):
-    return EventSourceResponse(service.subscribe_to_glucose_stream())
-
 
 @router.post("/push-client-webhook")
 async def receive_push_client_reading(

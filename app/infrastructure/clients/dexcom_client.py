@@ -25,10 +25,11 @@ DEXCOM_TREND_MAP = {
 }
 
 class DexcomShareClient(IPullClient):
-    def __init__(self, username, password):
+    def __init__(self, username, password, user_id:str="default_user"):
         # ous=True is required for Europe (including Turkey)
         print('Creating DexcomShare instance')
         self._client = Dexcom(password=password, username=username, region=Region.OUS)
+        self._user_id = user_id
 
     def fetch_latest_reading(self, sender=None, **kwargs):
         print('DexcomShareClient fetch latest reading')
@@ -49,7 +50,8 @@ class DexcomShareClient(IPullClient):
                 raw_metadata={
                     "mmol_l": bg.mmol_l,
                     "trend_integer": bg.trend
-                }
+                },
+                user_id=self._user_id
             )
 
             return glucose_obj

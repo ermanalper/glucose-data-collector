@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from sqlalchemy.exc import IntegrityError
 
 from app.core.exceptions import DatabaseError, AlarmAlreadyActiveException, MissingArgumentException
@@ -8,13 +10,13 @@ from app.models.alarm import Alarm
 
 
 class AlarmRepositoryImpl(IAlarmRepository):
-    def reset_alarm(self, alarm: Alarm):
-        if not alarm.id:
+    def reset_alarm(self, alarm_id: UUID):
+        if not alarm_id:
             raise MissingArgumentException("Alarm ID is missing")
         with SessionLocal() as session:
             try:
                 db_entity = session.query(AlarmEntity).filter(
-                    AlarmEntity.id == alarm.id
+                    AlarmEntity.id == alarm_id
                 ).first()
 
                 if db_entity is None:
@@ -37,17 +39,25 @@ class AlarmRepositoryImpl(IAlarmRepository):
                 )
 
     def set_alarm(self, alarm: Alarm):
+        print("Saving alarm to db")
         with SessionLocal() as session:
             try:
                 db_entity = AlarmEntity(
                     user_id=alarm.user_id,
                     timestamp=alarm.timestamp,
                     message=alarm.message,
-                    is_active=True
+                    is_active=True,
+                    level=alarm.level
                 )
                 session.add(db_entity)
                 session.commit()
             except IntegrityError as e:
+                # --- GERÇEK HATAYI BURADA YAZDIRALIM ---
+                print(f"--- DATABASE INTEGRITY ERROR DETAYI ---")
+                print(f"Original Exception: {e.orig}")
+                print(f"Statement: {e.statement}")
+                print(f"Parameters: {e.params}")
+                print(f"--------------------------------------")
                 session.rollback()
                 error_str = str(e.orig)
 

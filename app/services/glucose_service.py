@@ -9,6 +9,7 @@ from app.infrastructure.interfaces.glucose_provider_interface import IGlucosePro
 from app.infrastructure.interfaces.glucose_repository_interface import IGlucoseRepository
 from app.infrastructure.interfaces.glucose_service_interface import IGlucoseService
 from app.infrastructure.interfaces.sse_broadcaster_interface import ISSEBroadcaster
+from app.models import glucose
 from app.models.glucose import Glucose
 
 class GlucoseServiceImpl(IGlucoseService):
@@ -88,3 +89,5 @@ class GlucoseServiceImpl(IGlucoseService):
     def _save_and_broadcast(self, glucose_data: Glucose):
         print(f"[{datetime.datetime.now()}] [SERVICE] New glucose event caught! Pass it to repo and save.")
         self._repo.save(glucose_data)
+        new_glucose_data_event.send(self, glucose_data=glucose_data)
+

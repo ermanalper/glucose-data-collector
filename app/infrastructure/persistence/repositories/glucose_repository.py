@@ -24,6 +24,7 @@ class SqlAlchemyGlucoseRepository(IGlucoseRepository):
                 session.commit()
 
                 print(f"[DB] Written to SQL: {glucose.value} mg/dL | Direction: {glucose.trend.value}")
+
             except Exception as e:
                 # Rollback in case of error
                 session.rollback()

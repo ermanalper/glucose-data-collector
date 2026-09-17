@@ -11,4 +11,13 @@ async def stream_events(
     request: Request,
     broadcaster: ISSEBroadcaster = Depends(get_sse_broadcaster)
 ):
-    return EventSourceResponse(broadcaster.subscribe())
+    headers = {
+        "X-Accel-Buffering": "no",
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive"
+    }
+
+    return EventSourceResponse(
+        broadcaster.subscribe(),
+        headers=headers
+    )

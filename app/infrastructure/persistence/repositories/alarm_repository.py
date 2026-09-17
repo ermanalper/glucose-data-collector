@@ -38,7 +38,7 @@ class AlarmRepositoryImpl(IAlarmRepository):
                     message=f"Unknown database error: {str(e)}"
                 )
 
-    def set_alarm(self, alarm: Alarm):
+    def set_alarm(self, alarm: Alarm) -> UUID:
         print("Saving alarm to db")
         with SessionLocal() as session:
             try:
@@ -51,6 +51,7 @@ class AlarmRepositoryImpl(IAlarmRepository):
                 )
                 session.add(db_entity)
                 session.commit()
+                return db_entity.id
             except IntegrityError as e:
                 session.rollback()
                 error_str = str(e.orig)

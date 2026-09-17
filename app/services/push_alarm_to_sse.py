@@ -1,11 +1,13 @@
+from uuid import UUID
+
 from app.core.dependencies import get_sse_broadcaster, get_serializer
-from app.events.events import alarm_triggered_event
+from app.events.events import alarm_set_event, alarm_reset_event
 from app.mappers.sse_mappers import map_alarm_to_sse_payload
 from app.models.alarm import Alarm
 
 
-@alarm_triggered_event.connect
-def push_alarm_to_sse(sender, alarm_data: Alarm, **kwargs):
+@alarm_set_event.connect
+def push_set_alarm_to_sse(sender, alarm_data: Alarm, **kwargs):
     broadcaster = get_sse_broadcaster()
     serializer = get_serializer()
 
@@ -14,6 +16,19 @@ def push_alarm_to_sse(sender, alarm_data: Alarm, **kwargs):
     serialized_data = serializer.serialize(payload_dict)
 
     broadcaster.broadcast(
-        event_name="alarm",
+        event_name="set_alarm",
         data=serialized_data
     )
+
+@alarm_reset_event.connect
+def push_reset_alarm_to_sse(sender, alarm_id: UUID, **kwargs):
+    broadcaster = get_sse_broadcaster()
+    serializer = get_serializer()
+
+    serialized_data = serializer.serialize(alarm_id)
+
+    broadcaster.broadcast(
+        event_name="reset_alarm",
+        data=serialized_data
+    )
+

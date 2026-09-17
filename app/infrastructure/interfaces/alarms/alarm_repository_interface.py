@@ -1,12 +1,13 @@
 from abc import ABC, abstractmethod
 from typing import List
+from uuid import UUID
 
 from app.models.alarm import Alarm
 
 
 class IAlarmRepository(ABC):
     @abstractmethod
-    def set_alarm(self, alarm: Alarm):
+    def set_alarm(self, alarm: Alarm) -> UUID:
         pass
 
     @abstractmethod

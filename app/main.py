@@ -13,8 +13,8 @@ import app.services.glucose_service
 from app.infrastructure.persistence.database import Base, engine
 from app.services.scheduler import start_scheduler
 from app.services.push_glucose_to_sse import push_glucose_to_sse
-from app.services.push_alarm_to_sse import push_alarm_to_sse
-
+from app.services.push_alarm_to_sse import push_set_alarm_to_sse
+from app.services.push_alarm_to_sse import push_reset_alarm_to_sse
 def _init_services():
     get_glucose_service()
     get_insulin_service()

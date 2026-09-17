@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from uuid import UUID
 
-
+from app.core.exceptions import WTF, FalseArgumentException
 from app.events.events import new_glucose_data_event, alarm_set_event, alarm_reset_event
 from app.infrastructure.interfaces.alarms.alarm_repository_interface import IAlarmRepository
 from app.infrastructure.interfaces.alarms.alarm_service_interface import IAlarmService
@@ -13,20 +13,27 @@ class AlarmServiceImpl(IAlarmService):
     def __init__(self, repo : IAlarmRepository):
         new_glucose_data_event.connect(self._handle_new_glucose_data)
         self._repo = repo
+        self._lvl = 0
 
     def _handle_new_glucose_data(self, sender, glucose_data: Glucose, **kwargs):
+        prev_lvl = self._lvl
         status = glucose_data.status
+        if not isinstance(status, GlucoseStatus):
+            raise FalseArgumentException(message="glucose_data.status must be an instance of GlucoseStatus")
         if status in [GlucoseStatus.CRITICAL, GlucoseStatus.WARNING]:
             msg=""
-            lvl=-1
             if status is GlucoseStatus.WARNING:
                 msg = "Warning Alarm"
-                lvl = 1
+                self._lvl = 1
             elif status is GlucoseStatus.CRITICAL:
                 msg = "CRITICAL ALARM"
-                lvl = 2
-            self.set_alarm(user_id=glucose_data.user_id, message=msg, level=lvl)
+                self._lvl = 2
+            else:
+                raise WTF("WTF???")
+            if self._lvl > prev_lvl:
+                self.set_alarm(user_id=glucose_data.user_id, message=msg, level=self._lvl)
         else:
+            self._lvl = 0
             print('Everything is normal')
 
     # usually this should be a private function because alarms are not set manually, but automatically

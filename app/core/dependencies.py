@@ -14,6 +14,7 @@ from app.infrastructure.interfaces.meals.meal_repository_interface import IMealR
 from app.infrastructure.interfaces.meals.meal_service_interface import IMealService
 from app.infrastructure.interfaces.serializer_interface import ISerializer
 from app.infrastructure.interfaces.sse_broadcaster_interface import ISSEBroadcaster
+from app.infrastructure.interfaces.test_clients_service_interface import ITestClientsService
 from app.infrastructure.persistence.repositories.alarm_repository import AlarmRepositoryImpl
 from app.infrastructure.persistence.repositories.glucose_repository import SqlAlchemyGlucoseRepository
 from app.infrastructure.persistence.repositories.insulin_repository import SqlAlchemyInsulinRepository
@@ -23,6 +24,7 @@ from app.services.alarm_service import AlarmServiceImpl
 from app.services.glucose_service import GlucoseServiceImpl
 from app.services.insulin_service import InsulinServiceImpl
 from app.services.meal_service import MealServiceImpl
+from app.services.test_clients_service import TestClientsServiceImpl
 
 _glucose_provider_instance = None # Singleton instance
 _glucose_repository_instance = None # Singleton instance
@@ -35,6 +37,8 @@ _meal_service_instance = None
 _meal_repository_instance = None
 _alarm_service_instance = None
 _alarm_repository_instance = None
+_test_clients_service_instance = None
+
 
 
 def get_glucose_provider() -> IGlucoseProvider:
@@ -138,5 +142,11 @@ def get_alarm_service() -> IAlarmService:
     if _alarm_service_instance is None:
         _alarm_service_instance = AlarmServiceImpl(get_alarm_repository())
     return _alarm_service_instance
+
+def get_test_clients_service() -> ITestClientsService:
+    global _test_clients_service_instance
+    if _test_clients_service_instance is None:
+        _test_clients_service_instance = TestClientsServiceImpl()
+    return _test_clients_service_instance
 
 

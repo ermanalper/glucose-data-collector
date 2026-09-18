@@ -14,3 +14,7 @@ class ISSEBroadcaster(ABC):
     @abstractmethod
     def get_active_clients(self) -> List[str]:
         pass
+
+    @abstractmethod
+    def heartbeat(self, client_name: str) -> None:
+        pass

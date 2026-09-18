@@ -29,3 +29,11 @@ async def get_active_clients(broadcaster: ISSEBroadcaster = Depends(get_sse_broa
         "active_clients_count": len(broadcaster.get_active_clients()),
         "clients": broadcaster.get_active_clients()
     }
+
+@router.patch("/heartbeat", description="Ping the server")
+async def client_heartbeat(
+    client_name: str = Query(..., description="Client name that pings"),
+    broadcaster: ISSEBroadcaster = Depends(get_sse_broadcaster)
+):
+    broadcaster.heartbeat(client_name)
+    return {"status": "alive"}

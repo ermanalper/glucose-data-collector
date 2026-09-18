@@ -16,9 +16,9 @@ class MemorySSEBroadcaster(ISSEBroadcaster):
         try:
             while True:
                 yield await queue.get()
-        except asyncio.CancelledError:
-            # when frontend disconnects
+        finally:
             self._queues.discard(item)
+            print(f"[{client_name}] Left the tunnel. Listening clients: {len(self._queues)}")
 
     def broadcast(self, event_name: str, data: str) -> None:
         for loop, queue, _ in self._queues:

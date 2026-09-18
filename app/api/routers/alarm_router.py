@@ -36,3 +36,8 @@ def ack_active_alarm(alarm_id: UUID,
                      #                                              acknowledge the alarm is actually the owner of the alarm
                      service: IAlarmService = Depends(get_alarm_service)):
     service.reset_alarm(alarm_id)
+
+@router.patch("/ack-all-alarms")
+def ack_all_alarms_of_user(user_id: str = Depends(get_current_user_id),
+                           service: IAlarmService = Depends(get_alarm_service)):
+    service.reset_all_alarms_of_user(user_id)

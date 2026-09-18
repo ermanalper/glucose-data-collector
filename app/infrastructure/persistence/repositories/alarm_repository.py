@@ -81,3 +81,25 @@ class AlarmRepositoryImpl(IAlarmRepository):
                 )
                 for entity in entities
             ]
+
+    def reset_all_alarms_of_user(self, user_id: str):
+        if not user_id:
+            raise MissingArgumentException("User ID is missing")
+        with SessionLocal() as session:
+            try:
+                entities = session.query(AlarmEntity) \
+                    .filter(AlarmEntity.user_id == user_id,
+                            AlarmEntity.is_active) \
+                    .all()
+                for entity in entities:
+                    entity.is_active = False
+                session.commit()
+            except DatabaseError:
+                session.rollback()
+                raise
+
+            except Exception as e:
+                session.rollback()
+                raise DatabaseError(
+                    message=f"Unknown database error: {str(e)}"
+                )

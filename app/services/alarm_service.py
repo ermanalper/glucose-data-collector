@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from uuid import UUID
 
 from app.core.exceptions import WTF, FalseArgumentException
-from app.events.events import new_glucose_data_event, alarm_set_event, alarm_reset_event
+from app.events.events import new_glucose_data_event, alarm_set_event, alarm_reset_event, reset_alarms_of_user_event
 from app.infrastructure.interfaces.alarms.alarm_repository_interface import IAlarmRepository
 from app.infrastructure.interfaces.alarms.alarm_service_interface import IAlarmService
 from app.models.alarm import Alarm
@@ -52,3 +52,7 @@ class AlarmServiceImpl(IAlarmService):
     def get_active_alarms(self, user_id: str):
         active_alarms = self._repo.get_active_alarms(user_id)
         return active_alarms
+
+    def reset_all_alarms_of_user(self, user_id: str):
+        self._repo.reset_all_alarms_of_user(user_id)
+        reset_alarms_of_user_event.send(user_id=user_id)

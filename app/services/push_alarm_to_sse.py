@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from app.core.dependencies import get_sse_broadcaster, get_serializer
-from app.events.events import alarm_set_event, alarm_reset_event
+from app.events.events import alarm_set_event, alarm_reset_event, reset_alarms_of_user_event
 from app.mappers.sse_mappers import map_alarm_to_sse_payload
 from app.models.alarm import Alarm
 
@@ -32,3 +32,14 @@ def push_reset_alarm_to_sse(sender, alarm_id: UUID, **kwargs):
         data=serialized_data
     )
 
+@reset_alarms_of_user_event.connect
+def push_reset_all_alarms_of_user_to_sse(sender, user_id: UUID, **kwargs):
+    broadcaster = get_sse_broadcaster()
+    serializer = get_serializer()
+
+    serialized_data = serializer.serialize(user_id)
+
+    broadcaster.broadcast(
+        event_name="reset_all_alarms_of_user",
+        data=serialized_data
+    )

@@ -17,3 +17,7 @@ class IAlarmRepository(ABC):
     @abstractmethod
     def get_active_alarms(self, user_id: str) -> List[Alarm]:
         pass
+
+    @abstractmethod
+    def reset_all_alarms_of_user(self, user_id: str):
+        pass

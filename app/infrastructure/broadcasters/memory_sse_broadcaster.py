@@ -1,27 +1,31 @@
 import asyncio
-from typing import Set, Tuple, AsyncGenerator
+from typing import Set, Tuple, AsyncGenerator, List
 from app.infrastructure.interfaces.sse_broadcaster_interface import ISSEBroadcaster
 
 
 class MemorySSEBroadcaster(ISSEBroadcaster):
     def __init__(self):
-        self._queues: Set[Tuple[asyncio.AbstractEventLoop, asyncio.Queue]] = set()
+        self._queues: Set[Tuple[asyncio.AbstractEventLoop, asyncio.Queue, str]] = set()
 
-    async def subscribe(self) -> AsyncGenerator[dict, None]:
+    async def subscribe(self, client_name: str) -> AsyncGenerator[dict, None]:
         loop = asyncio.get_running_loop()
         queue = asyncio.Queue()
-        item = (loop, queue)
+        item = (loop, queue, client_name)
 
         self._queues.add(item)
         try:
             while True:
                 yield await queue.get()
         except asyncio.CancelledError:
-            self._queues.remove(item)
+            # when frontend disconnects
+            self._queues.discard(item)
 
     def broadcast(self, event_name: str, data: str) -> None:
-        for loop, queue in self._queues:
+        for loop, queue, _ in self._queues:
             loop.call_soon_threadsafe(
                 queue.put_nowait,
                 {"event": event_name, "data": data}
             )
+
+    def get_active_clients(self) -> List[str]:
+        return [client_name for _, _, client_name in self._queues]

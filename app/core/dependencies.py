@@ -1,7 +1,8 @@
 from pathlib import Path
 
-from app.core.config import IS_DEVELOPMENT
+from app.core.config import IS_DEVELOPMENT, settings
 from app.infrastructure.broadcasters.memory_sse_broadcaster import MemorySSEBroadcaster
+from app.infrastructure.clients.dexcom_client import DexcomShareClient
 from app.infrastructure.clients.push_client import PushClient
 from app.infrastructure.interfaces.alarms.alarm_repository_interface import IAlarmRepository
 from app.infrastructure.interfaces.alarms.alarm_service_interface import IAlarmService
@@ -51,7 +52,8 @@ def get_glucose_provider() -> IGlucoseProvider:
             _glucose_provider_instance = PushClient()
            # _glucose_provider_instance = SimulationClient(str(mock_file_path))
            # _glucose_provider_instance = NightscoutClient(base_url=NIGHTSCOUT_DOCKER_URL ,raw_api_secret=settings.nightscout_docker_api_secret)
-
+            #_glucose_provider_instance = DexcomShareClient(username=settings.dexcom_email, password=settings.dexcom_password)
+            print(settings.dexcom_email, ' ', settings.dexcom_password)
             print('Development, provider: ', _glucose_provider_instance)
         else:
             # if not development, use desired client (uncomment) and delete 'pass'

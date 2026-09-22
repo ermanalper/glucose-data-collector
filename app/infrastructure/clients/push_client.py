@@ -29,6 +29,9 @@ TREND_MAP = {
     "↓": TrendState.SINGLE_DOWN,
     "↓↓": TrendState.DOUBLE_DOWN,
 
+    "→": TrendState.FLAT,           # <-- Eksik olan ve hataya sebep olan karakter bu!
+
+
     "Steady": TrendState.FLAT,
     "Slowly Rising": TrendState.FORTY_FIVE_UP,
     "Rising": TrendState.SINGLE_UP,

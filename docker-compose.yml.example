@@ -1,0 +1,305 @@
+services:
+
+  # ============================================================
+  # 1. MONGO DATABASE
+  # ============================================================
+  # MongoDB database used by Nightscout.
+  #
+  # Nightscout stores glucose readings, treatments, profiles,
+  # device information, and other CGM-related data in MongoDB.
+  #
+  # This database is only used internally by the Nightscout
+  # container, so its port is NOT exposed to the internet.
+  #
+  # Data is persisted in the "mongo_data" Docker volume.
+  # ============================================================
+  mongo:
+    image: mongo:7.0
+    container_name: nightscout_mongo
+    restart: always
+
+    # Do NOT expose MongoDB publicly.
+    # Nightscout communicates with MongoDB through Docker's
+    # internal network.
+    #
+    # ports:
+    #   - "27017:27017"
+
+    volumes:
+      - mongo_data:/data/db
+
+
+  # ============================================================
+  # 2. NIGHTSCOUT
+  # ============================================================
+  # Nightscout is the CGM data server / web application.
+  #
+  # In this project, Nightscout acts as an intermediate layer
+  # between Dexcom and the rest of the system.
+  #
+  # The general data flow is:
+  #
+  #     Dexcom
+  #       |
+  #       v
+  #   Nightscout
+  #       |
+  #       v
+  #    MongoDB
+  #
+  # The Python backend can then retrieve glucose data from
+  # Nightscout.
+  #
+  # Nightscout is bound to localhost here because it should NOT
+  # be directly exposed to the public internet.
+  #
+  # If public access is required, Nginx Proxy Manager should
+  # handle HTTPS and reverse-proxy the required service.
+  # ============================================================
+  nightscout:
+    image: nightscout/cgm-remote-monitor:latest
+    container_name: nightscout_app
+    restart: always
+
+    # Nightscout listens on port 1337 internally.
+    # Binding it to 127.0.0.1 prevents direct public access.
+    ports:
+      - "127.0.0.1:1337:1337"
+
+    environment:
+      # MongoDB connection string.
+      - MONGO_CONNECTION=${MONGO_CONNECTION}
+
+      # Secret used by Nightscout for authentication/security.
+      - API_SECRET=${API_SECRET}
+
+      # Enable the Nightscout features required by this project.
+      - ENABLE=bridge careportal basal
+
+      # Default Nightscout role for authenticated users.
+      - AUTH_DEFAULT_ROLES=readable
+
+      # Dexcom account credentials used by the Nightscout bridge.
+      - BRIDGE_USER_NAME=${BRIDGE_USER_NAME}
+      - BRIDGE_PASSWORD=${BRIDGE_PASSWORD}
+
+      # Dexcom server region.
+      - BRIDGE_SERVER=EU
+
+      # HTTP mode is enabled internally.
+      # Public HTTPS access should be handled by Nginx Proxy Manager.
+      - INSECURE_USE_HTTP=true
+
+    depends_on:
+      - mongo
+
+
+  # ============================================================
+  # 3. PYTHON BACKEND
+  # ============================================================
+  # Main backend application of the project.
+  #
+  # Built from the Dockerfile in the project root.
+  #
+  # Responsibilities include:
+  #
+  #   - REST API
+  #   - Glucose data processing
+  #   - PostgreSQL communication
+  #   - Alarm management
+  #   - SSE (Server-Sent Events)
+  #   - Communication with the Android client
+  #   - Receiving glucose data from the Go worker
+  #
+  # The backend listens on port 8000.
+  #
+  # It is bound to localhost because the public HTTPS endpoint
+  # should be provided through Nginx Proxy Manager.
+  # ============================================================
+  api:
+    build: .
+    container_name: dexcom_backend
+    restart: always
+
+    # FastAPI / Uvicorn
+    ports:
+      - "127.0.0.1:8000:8000"
+
+    depends_on:
+      - db
+
+    # Load application secrets and configuration from .env.
+    env_file:
+      - .env
+
+    environment:
+      # PostgreSQL connection used by the backend.
+      - DATABASE_URL=${DATABASE_URL}
+
+
+  # ============================================================
+  # 4. GO WORKER
+  # ============================================================
+  # Background worker responsible for communicating with Dexcom.
+  #
+  # The worker periodically retrieves glucose data from Dexcom
+  # and sends the data to the Python backend through the webhook.
+  #
+  # Data flow:
+  #
+  #     Dexcom
+  #        |
+  #        v
+  #    Go Worker
+  #        |
+  #        | HTTP POST
+  #        v
+  #    Python API
+  #
+  # The worker does NOT need to be publicly accessible.
+  # It communicates with the backend through Docker's internal
+  # network.
+  # ============================================================
+  go_worker:
+    build: ./dexcom-go-worker
+    container_name: dexcom_go_worker
+    restart: always
+
+    depends_on:
+      - api
+
+    environment:
+      # Dexcom account credentials.
+      - DEXCOM_USERNAME=${BRIDGE_USER_NAME}
+      - DEXCOM_PASSWORD=${BRIDGE_PASSWORD}
+
+      # Internal Docker URL of the Python backend.
+      #
+      # "dexcom_backend" is the Docker container name.
+      # Port 8000 is accessible internally between containers.
+      - WEBHOOK_URL=http://dexcom_backend:8000/api/v1/glucose/push-client-webhook
+
+      # API key used when communicating with the backend.
+      - API_KEY=${API_KEY}
+
+
+  # ============================================================
+  # 5. POSTGRESQL DATABASE
+  # ============================================================
+  # PostgreSQL database used by the Python backend.
+  #
+  # Unlike Nightscout, which uses MongoDB, the main application
+  # backend uses PostgreSQL for its own structured data.
+  #
+  # Examples of data stored here:
+  #
+  #   - Glucose readings
+  #   - Insulin types
+  #   - Alarms
+  #   - Meal shortcuts
+  #   - Application/user-related data
+  #
+  # PostgreSQL is NOT exposed to the internet.
+  # Only the Python backend communicates with it.
+  #
+  # Data is persisted using the "postgres_data" Docker volume.
+  # ============================================================
+  db:
+    image: postgres:15-alpine
+    container_name: dexcom_postgres
+    restart: always
+
+    # Load PostgreSQL credentials from .env.
+    env_file:
+      - .env
+
+    # Do NOT expose PostgreSQL publicly.
+    #
+    # ports:
+    #   - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+
+  # ============================================================
+  # 6. NGINX PROXY MANAGER
+  # ============================================================
+  # Nginx Proxy Manager (NPM) is used as the public-facing
+  # reverse proxy for the server.
+  #
+  # It is especially useful when this project is deployed on
+  # a VPS/server that is directly accessible from the internet.
+  #
+  # NPM can:
+  #
+  #   - Receive incoming HTTP/HTTPS requests
+  #   - Provide HTTPS using Let's Encrypt certificates
+  #   - Automatically redirect HTTP -> HTTPS
+  #   - Reverse-proxy requests to internal Docker services
+  #   - Manage domains/subdomains
+  #
+  # Example:
+  #
+  #     Internet
+  #         |
+  #         v
+  #     HTTPS :443
+  #         |
+  #         v
+  #     Nginx Proxy Manager
+  #         |
+  #         +----> Python API :8000
+  #         |
+  #         +----> Nightscout :1337
+  #
+  # Ports 80 and 443 are intentionally exposed because these
+  # are the standard HTTP/HTTPS ports used for public internet
+  # traffic.
+  #
+  # Port 81 is the Nginx Proxy Manager administration interface.
+  # It is bound to localhost so the management panel itself is
+  # not directly exposed to the public internet.
+  #
+  # "npm_data" stores NPM configuration.
+  # "letsencrypt" stores SSL/TLS certificates.
+  # ============================================================
+  npm:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: nginx_proxy_manager
+    restart: always
+
+    # Public HTTP traffic.
+    # Used for HTTP requests and Let's Encrypt validation.
+    - "80:80"
+
+    # Public HTTPS traffic.
+    # This is the main secure entry point from the internet.
+    - "443:443"
+
+    # Nginx Proxy Manager administration panel.
+    # Accessible only from the server itself.
+    ports:
+      - "127.0.0.1:81:81"
+
+    volumes:
+      # NPM configuration and database.
+      - ./npm_data:/data
+
+      # SSL/TLS certificates managed by Let's Encrypt.
+      - ./letsencrypt:/etc/letsencrypt
+
+
+# ============================================================
+# DOCKER VOLUMES
+# ============================================================
+# Named volumes keep database data even if containers are
+# recreated or updated.
+# ============================================================
+volumes:
+
+  # Nightscout MongoDB persistent storage.
+  mongo_data:
+
+  # Python backend PostgreSQL persistent storage.
+  postgres_data:

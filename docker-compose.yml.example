@@ -67,7 +67,7 @@ services:
       - BRIDGE_PASSWORD=${BRIDGE_PASSWORD}
 
       # Dexcom server region.
-      - BRIDGE_SERVER=EU
+      - BRIDGE_SERVER=${BRIDGE_SERVER}
 
       # Nightscout communicates internally over HTTP.
       # Public HTTPS is handled by Nginx Proxy Manager.

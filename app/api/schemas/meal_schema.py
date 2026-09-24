@@ -12,7 +12,7 @@ class MealShortcutRequest(BaseModel):
 class MealResponse(BaseModel):
     desc: str
     timestamp: datetime
-    glucose_value: int
+    glucose_value: int | None = None
 
 class MealShortcutResponse(BaseModel):
     title: str

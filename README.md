@@ -12,7 +12,7 @@ The system has different client types to fetch glucose data. The client to be us
 
 *   **Pull Clients (Dexcom Share & Nightscout):** Fetches data periodically using a timer. The timer can be adjusted in `scheduler.py` (or tested using the `IS_DEVELOPMENT` boolean in `config.py`). 
     *   *Important Note:* When using Dexcom, you must enter your actual "Publisher" account, not your "Follow" account.
-*   **Push Client:** Listens to a webhook endpoint. When a new glucose value arrives, it logs it into the system.
+*   *   **Push Client:** Listens to a webhook endpoint. When a new glucose value arrives, it logs it into the system. *(Example: You can use the [dexcom-quick-glance-listener](https://github.com/ermanalper/dexcom-quick-glance-listener) Android app to read Dexcom notifications from your phone and seamlessly push them to this endpoint).*
 *   **Dexcom-Go-Worker:** If your Dexcom username appears as a *phone number*, standard Pull Clients will likely not work. In this case, you can use the `dexcom-go-worker` service. As long as this service is configured and running, it pulls data from Dexcom and forwards it to the Push Client. (Make sure you select the Push Client in the backend `dependencies` settings when using this method).
 *   **Simulation Client:** A pull-based test client that you can use during the development process. It provides a fake/new glucose value to the system with every timer tick.
 
@@ -60,7 +60,7 @@ Sistem, glukoz verilerini almak için farklı istemci (client) türlerine sahipt
 
 *   **Pull Clients (Dexcom Share & Nightscout):** Bir timer ile periyodik olarak veri çeker. `scheduler.py` içinden timer ayarlanabilir (veya `config.py` içindeki `IS_DEVELOPMENT` boolean değeri ile test yapılabilir). 
     *   *Önemli Not:* Dexcom kullanırken "Follow" hesabınızı değil, asıl "Publisher" hesabınızı girmelisiniz.
-*   **Push Client:** Bir webhook endpoint'ini dinler. Yeni bir glukoz değeri geldiğinde sisteme girişini yapar.
+*   *   **Push Client:** Bir webhook endpoint'ini dinler. Yeni bir glukoz değeri geldiğinde sisteme girişini yapar. *(Örnek kullanım: Telefondaki Dexcom bildirimlerini okuyup doğrudan bu endpoint'e veri göndermek için [dexcom-quick-glance-listener](https://github.com/ermanalper/dexcom-quick-glance-listener) Android uygulamasını kullanabilirsiniz).*
 *   **Dexcom-Go-Worker:** Eğer Dexcom kullanıcı adınız bir *telefon numarası* olarak gözüküyorsa standart Pull Client'lar muhtemelen çalışmayacaktır. Bu durumda `dexcom-go-worker` servisini kullanabilirsiniz. Bu servis yapılandırıldığı sürece Dexcom'dan veriyi çeker ve Push Client'a atar. (Bu yöntemi kullanırken backend `dependencies` ayarlarında Push Client seçtiğinizden emin olun).
 *   **Simulation Client:** Geliştirme sürecinde kullanabileceğiniz, her timer tick'i ile sisteme sahte/yeni bir glukoz değeri veren pull tabanlı bir test istemcisidir.
 

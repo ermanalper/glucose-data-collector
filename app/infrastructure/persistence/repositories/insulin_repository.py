@@ -4,7 +4,7 @@ from typing import List
 from sqlalchemy.exc import IntegrityError
 
 from app.core.exceptions import DatabaseError, ResourceNotFoundException
-from app.infrastructure.interfaces.insulin.insulin_repository_interface import IInsulinRepository
+from app.core.ports.repositories.insulin_repository_interface import IInsulinRepository
 from app.infrastructure.persistence.entities.insulin_dose_orm import InsulinDoseEntity
 from app.infrastructure.persistence.entities.insulin_orm import InsulinEntity
 from app.models.insulin import Insulin

@@ -17,7 +17,7 @@ i.e. If a pull client is being used, the backend will raise an error when the we
 
 from datetime import datetime, timezone
 
-from app.infrastructure.interfaces.glucose.glucose_provider_interface import IPushClient
+from app.core.ports.clients.glucose_provider_interface import IPushClient
 from app.models.glucose import TrendState, Glucose
 
 TREND_MAP = {
@@ -29,7 +29,7 @@ TREND_MAP = {
     "↓": TrendState.SINGLE_DOWN,
     "↓↓": TrendState.DOUBLE_DOWN,
 
-    "→": TrendState.FLAT,           # <-- Eksik olan ve hataya sebep olan karakter bu!
+    "→": TrendState.FLAT,
 
 
     "Steady": TrendState.FLAT,

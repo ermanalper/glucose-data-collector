@@ -6,7 +6,7 @@ from app.core.dependencies import get_current_user_id, get_glucose_service
 from fastapi import APIRouter, Depends
 
 from app.core.exceptions import FalseClientException
-from app.infrastructure.interfaces.glucose.glucose_service_interface import IGlucoseService
+from app.services.interfaces.glucose_service_interface import IGlucoseService
 router = APIRouter(prefix="/api/v1/glucose", tags=["Glucose Data"])
 
 

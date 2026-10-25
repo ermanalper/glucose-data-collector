@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 import json
 
-from app.infrastructure.interfaces.glucose.glucose_provider_interface import IPullClient
+from app.core.ports.clients.glucose_provider_interface import IPullClient
 from app.models.glucose import Glucose, TrendState
 
 """

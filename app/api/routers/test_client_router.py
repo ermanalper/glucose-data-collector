@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from app.core.dependencies import get_test_clients_service
-from app.infrastructure.interfaces.test_clients_service_interface import ITestClientsService
+from app.services.interfaces.test_clients_service_interface import ITestClientsService
 
 router = APIRouter(prefix="/api/v1/clients", tags=["Test Clients"])
 

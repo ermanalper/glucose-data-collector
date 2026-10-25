@@ -1,9 +1,9 @@
 import datetime
 
 from app.core.exceptions import ResourceNotFoundException
-from app.infrastructure.interfaces.glucose.glucose_service_interface import IGlucoseService
-from app.infrastructure.interfaces.insulin.insulin_repository_interface import IInsulinRepository
-from app.infrastructure.interfaces.insulin.insulin_service_interface import IInsulinService
+from app.services.interfaces.glucose_service_interface import IGlucoseService
+from app.core.ports.repositories.insulin_repository_interface import IInsulinRepository
+from app.services.interfaces.insulin_service_interface import IInsulinService
 from app.models.insulin import Insulin
 from app.models.insulin_dose import InsulinDose
 

@@ -1,5 +1,5 @@
 from app.events.events import run_test_client_protocol_event
-from app.infrastructure.interfaces.test_clients_service_interface import ITestClientsService
+from app.services.interfaces.test_clients_service_interface import ITestClientsService
 
 
 class TestClientsServiceImpl(ITestClientsService):

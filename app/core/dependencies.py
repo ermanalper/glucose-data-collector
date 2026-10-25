@@ -2,20 +2,19 @@ from pathlib import Path
 
 from app.core.config import IS_DEVELOPMENT, settings
 from app.infrastructure.broadcasters.memory_sse_broadcaster import MemorySSEBroadcaster
-from app.infrastructure.clients.dexcom_client import DexcomShareClient
-from app.infrastructure.clients.push_client import PushClient
-from app.infrastructure.interfaces.alarms.alarm_repository_interface import IAlarmRepository
-from app.infrastructure.interfaces.alarms.alarm_service_interface import IAlarmService
-from app.infrastructure.interfaces.glucose.glucose_provider_interface import IGlucoseProvider
-from app.infrastructure.interfaces.glucose.glucose_repository_interface import IGlucoseRepository
-from app.infrastructure.interfaces.glucose.glucose_service_interface import IGlucoseService
-from app.infrastructure.interfaces.insulin.insulin_repository_interface import IInsulinRepository
-from app.infrastructure.interfaces.insulin.insulin_service_interface import IInsulinService
-from app.infrastructure.interfaces.meals.meal_repository_interface import IMealRepository
-from app.infrastructure.interfaces.meals.meal_service_interface import IMealService
-from app.infrastructure.interfaces.serializer_interface import ISerializer
-from app.infrastructure.interfaces.sse_broadcaster_interface import ISSEBroadcaster
-from app.infrastructure.interfaces.test_clients_service_interface import ITestClientsService
+from app.infrastructure.clients.simulation_client import SimulationClient
+from app.core.ports.repositories.alarm_repository_interface import IAlarmRepository
+from app.services.interfaces.alarm_service_interface import IAlarmService
+from app.core.ports.clients.glucose_provider_interface import IGlucoseProvider
+from app.core.ports.repositories.glucose_repository_interface import IGlucoseRepository
+from app.services.interfaces.glucose_service_interface import IGlucoseService
+from app.core.ports.repositories.insulin_repository_interface import IInsulinRepository
+from app.services.interfaces.insulin_service_interface import IInsulinService
+from app.core.ports.repositories.meal_repository_interface import IMealRepository
+from app.services.interfaces.meal_service_interface import IMealService
+from app.core.ports.serializer_interface import ISerializer
+from app.core.ports.sse_broadcaster_interface import ISSEBroadcaster
+from app.services.interfaces.test_clients_service_interface import ITestClientsService
 from app.infrastructure.persistence.repositories.alarm_repository import AlarmRepositoryImpl
 from app.infrastructure.persistence.repositories.glucose_repository import SqlAlchemyGlucoseRepository
 from app.infrastructure.persistence.repositories.insulin_repository import SqlAlchemyInsulinRepository
@@ -49,8 +48,8 @@ def get_glucose_provider() -> IGlucoseProvider:
         if IS_DEVELOPMENT:
             current_dir = Path(__file__).resolve().parent
             mock_file_path = current_dir.parent.parent / "data" / "mock" / "simulation_data.json"
-            _glucose_provider_instance = PushClient()
-           # _glucose_provider_instance = SimulationClient(str(mock_file_path))
+           # _glucose_provider_instance = PushClient()
+            _glucose_provider_instance = SimulationClient(str(mock_file_path))
            # _glucose_provider_instance = NightscoutClient(base_url=NIGHTSCOUT_DOCKER_URL ,raw_api_secret=settings.nightscout_docker_api_secret)
             #_glucose_provider_instance = DexcomShareClient(username=settings.dexcom_email, password=settings.dexcom_password)
             print(settings.dexcom_email, ' ', settings.dexcom_password)

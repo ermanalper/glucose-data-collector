@@ -1,7 +1,7 @@
 import asyncio
 import time
 from typing import Set, Tuple, AsyncGenerator, List, Dict
-from app.infrastructure.interfaces.sse_broadcaster_interface import ISSEBroadcaster
+from app.core.ports.sse_broadcaster_interface import ISSEBroadcaster
 
 
 class MemorySSEBroadcaster(ISSEBroadcaster):

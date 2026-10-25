@@ -1,7 +1,7 @@
 import json
 from typing import Any
 
-from app.infrastructure.interfaces.serializer_interface import ISerializer
+from app.core.ports.serializer_interface import ISerializer
 
 
 class JsonSerializer(ISerializer):

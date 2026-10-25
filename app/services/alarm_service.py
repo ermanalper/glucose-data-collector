@@ -3,8 +3,8 @@ from uuid import UUID
 
 from app.core.exceptions import WTF, FalseArgumentException
 from app.events.events import new_glucose_data_event, alarm_set_event, alarm_reset_event, reset_alarms_of_user_event
-from app.infrastructure.interfaces.alarms.alarm_repository_interface import IAlarmRepository
-from app.infrastructure.interfaces.alarms.alarm_service_interface import IAlarmService
+from app.core.ports.repositories.alarm_repository_interface import IAlarmRepository
+from app.services.interfaces.alarm_service_interface import IAlarmService
 from app.models.alarm import Alarm
 from app.models.glucose import Glucose, GlucoseStatus
 

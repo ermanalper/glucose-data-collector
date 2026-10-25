@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Request, Query
 from sse_starlette.sse import EventSourceResponse
 
 from app.core.dependencies import get_sse_broadcaster
-from app.infrastructure.interfaces.sse_broadcaster_interface import ISSEBroadcaster
+from app.core.ports.sse_broadcaster_interface import ISSEBroadcaster
 
 router = APIRouter(prefix="/api/v1/events", tags=["SSE Stream"])
 

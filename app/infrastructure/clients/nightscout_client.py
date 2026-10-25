@@ -4,7 +4,7 @@ import requests
 
 from app.core.config import NIGHTSCOUT_DOCKER_URL, settings
 from app.core.exceptions import ClientError
-from app.infrastructure.interfaces.glucose.glucose_provider_interface import IPullClient
+from app.core.ports.clients.glucose_provider_interface import IPullClient
 from app.models.glucose import Glucose, TrendState
 
 NIGHTSCOUT_TREND_MAP = {

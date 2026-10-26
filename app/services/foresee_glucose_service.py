@@ -2,13 +2,15 @@ from datetime import datetime, timezone
 from sympy import Poly, Rational, Symbol, interpolate
 
 from app.core.ports.repositories.glucose_repository_interface import IGlucoseRepository
+from app.core.ports.repositories.interpolation_repository_interface import IInterpolationRepository
 from app.models.poly_result import PolyResult
 from app.services.interfaces.foresee_glucose_service_interface import IForeseeGlucoseService
 
 
 class ForeseeGlucoseService(IForeseeGlucoseService):
-    def __init__(self, glucose_repo: IGlucoseRepository):
+    def __init__(self, interpolation_repo: IInterpolationRepository, glucose_repo: IGlucoseRepository):
         self._glucose_repo = glucose_repo
+        self._interpolation_repo = interpolation_repo
 
     def interpolate(self, start_time: datetime, end_time: datetime, user_id: str) -> PolyResult:
         # get the glucose data between the start time and the end time
@@ -58,4 +60,6 @@ class ForeseeGlucoseService(IForeseeGlucoseService):
 
         coeffs = [float(c) for c in poly.all_coeffs()]
 
-        return PolyResult(coefficients=coeffs, degree=(len(coeffs) - 1))
+        poly_result = PolyResult(coefficients=coeffs, degree=(len(coeffs) - 1))
+        self._interpolation_repo.save_interpolation(poly_result, timestamp=datetime.now(timezone.utc))
+        return poly_result

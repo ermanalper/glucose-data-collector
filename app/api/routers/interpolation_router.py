@@ -10,7 +10,7 @@ from app.services.interfaces.foresee_glucose_service_interface import IForeseeGl
 router = APIRouter(prefix="/api/v1/foresee-glucose", tags=["Foresee Glucose Data"])
 
 @router.get("/interpolate", response_model=PolyResponse)
-async def get_glucose_data_interpolation(
+def get_glucose_data_interpolation(
             start_time: datetime = Query(..., description="Start time (e.g.: 2026-08-28T10:00:00)"),
             end_time: datetime = Query(default_factory=lambda: datetime.now(timezone.utc),
                                        description="End time (Default: UTC now)"),

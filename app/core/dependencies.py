@@ -1,9 +1,11 @@
 from pathlib import Path
 
-from app.core.config import IS_DEVELOPMENT, settings
+from app.core.config import IS_DEVELOPMENT, settings, INTERPOLATION_STORAGE_PATH
+from app.core.ports.repositories.interpolation_repository_interface import IInterpolationRepository
 from app.infrastructure.broadcasters.memory_sse_broadcaster import MemorySSEBroadcaster
 from app.infrastructure.clients.simulation_client import SimulationClient
 from app.core.ports.repositories.alarm_repository_interface import IAlarmRepository
+from app.infrastructure.persistence.repositories.interpolation_repository import InterpolationRepository
 from app.services.foresee_glucose_service import ForeseeGlucoseService
 from app.services.interfaces.alarm_service_interface import IAlarmService
 from app.core.ports.clients.glucose_provider_interface import IGlucoseProvider
@@ -41,7 +43,7 @@ _alarm_service_instance = None
 _alarm_repository_instance = None
 _test_clients_service_instance = None
 _foresee_glucose_service_instance = None
-
+_interpolation_repository_instance = None
 
 def get_glucose_provider() -> IGlucoseProvider:
     global _glucose_provider_instance
@@ -152,10 +154,18 @@ def get_test_clients_service() -> ITestClientsService:
         _test_clients_service_instance = TestClientsServiceImpl()
     return _test_clients_service_instance
 
+
+def get_interpolation_repo() -> IInterpolationRepository:
+    global _interpolation_repository_instance
+    if _interpolation_repository_instance is None:
+        _interpolation_repository_instance = InterpolationRepository(file_path=INTERPOLATION_STORAGE_PATH, serializer=get_serializer())
+    return _interpolation_repository_instance
+
+
 def get_foresee_glucose_service() -> IForeseeGlucoseService:
     global _foresee_glucose_service_instance
     if _foresee_glucose_service_instance is None:
-        _foresee_glucose_service_instance = ForeseeGlucoseService(glucose_repo=get_glucose_repository())
+        _foresee_glucose_service_instance = ForeseeGlucoseService(interpolation_repo=get_interpolation_repo(), glucose_repo=get_glucose_repository())
     return _foresee_glucose_service_instance
 
 

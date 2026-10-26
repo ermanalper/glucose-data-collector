@@ -23,9 +23,6 @@ class IGlucoseService(ABC):
     def get_first_glucose_entry_date(self, current_user_id):
         pass
 
-    @abstractmethod
-    def subscribe_to_glucose_stream(self) -> AsyncGenerator[dict, None]:
-        pass
 
     @abstractmethod
     def get_glucose_value_at_time(self, user_id: str, timestamp: datetime) -> Optional[int]:

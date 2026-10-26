@@ -145,7 +145,7 @@ def get_alarm_repository() -> IAlarmRepository:
 def get_alarm_service() -> IAlarmService:
     global _alarm_service_instance
     if _alarm_service_instance is None:
-        _alarm_service_instance = AlarmServiceImpl(get_alarm_repository())
+        _alarm_service_instance = AlarmServiceImpl(get_alarm_repository(), get_foresee_glucose_service())
     return _alarm_service_instance
 
 def get_test_clients_service() -> ITestClientsService:

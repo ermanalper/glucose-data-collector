@@ -40,10 +40,6 @@ class GlucoseServiceImpl(IGlucoseService):
         except ResourceNotFoundException:
             return None
 
-    def subscribe_to_glucose_stream(self) -> AsyncGenerator[dict, None]:
-        return self._broadcaster.subscribe()
-
-
     def get_first_glucose_entry_date(self, current_user_id):
         first_data_date = self._repo.get_first_entry_date(user_id=current_user_id)
         return first_data_date

@@ -1,4 +1,5 @@
-from datetime import datetime, timezone
+import threading
+from datetime import datetime, timezone, timedelta
 from uuid import UUID
 
 from app.core.exceptions import WTF, FalseArgumentException
@@ -7,15 +8,44 @@ from app.core.ports.repositories.alarm_repository_interface import IAlarmReposit
 from app.services.interfaces.alarm_service_interface import IAlarmService
 from app.models.alarm import Alarm
 from app.models.glucose import Glucose, GlucoseStatus
+from app.services.interfaces.foresee_glucose_service_interface import IForeseeGlucoseService
 
 
 class AlarmServiceImpl(IAlarmService):
-    def __init__(self, repo : IAlarmRepository):
+    def __init__(self, repo : IAlarmRepository, foresee_service: IForeseeGlucoseService):
         new_glucose_data_event.connect(self._handle_new_glucose_data)
         self._repo = repo
         self._lvl = 0
+        self._foresee_service = foresee_service
 
+    def _run_interpolation_safely(self, start_time, end_time):
+        try:
+            poly = self._foresee_service.interpolate(
+                start_time=start_time,
+                end_time=end_time
+            )
+            # move the alarm logic here
+        except Exception as e:
+            print(f"[ERROR] Interpolation background job failed: {e}")
+
+    # ALARM LOGIC IS ALL UP TO THE FINAL USER, CHANGE IT TO YOUR PREFERENCE
+    # some lines are hardcoded for fast production, they should later be moved to config.py
     def _handle_new_glucose_data(self, sender, glucose_data: Glucose, **kwargs):
+        utc_plus_3 = timezone(timedelta(hours=3))
+        now = datetime.now(utc_plus_3)
+        hour = now.hour
+        if hour >= 9:
+            pass
+
+        start_time = datetime.now(timezone(timedelta(hours=3))).replace(hour=0, minute=0, second=0, microsecond=0)
+        end_time = datetime.now(timezone(timedelta(hours=3)))
+        thread = threading.Thread(
+            target=self._run_interpolation_safely,
+            args=(start_time, end_time)
+        )
+        thread.daemon = True
+        thread.start()
+        '''
         prev_lvl = self._lvl
         status = glucose_data.status
         if not isinstance(status, GlucoseStatus):
@@ -36,7 +66,9 @@ class AlarmServiceImpl(IAlarmService):
             self._lvl = 0
             print('Everything is normal')
 
-    # usually this should be a private function because alarms are not set manually, but automatically
+        '''
+
+    # actually this should be a private function because alarms are not set manually, but automatically
     # but for test concerns, this can be called from an endpoint
     def set_alarm(self, user_id: str, message: str, level: int):
         alarm = Alarm(user_id=user_id, level=level, message=message, timestamp = datetime.now(timezone.utc), id=None)

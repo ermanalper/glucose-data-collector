@@ -4,9 +4,11 @@ from app.core.config import IS_DEVELOPMENT, settings
 from app.infrastructure.broadcasters.memory_sse_broadcaster import MemorySSEBroadcaster
 from app.infrastructure.clients.simulation_client import SimulationClient
 from app.core.ports.repositories.alarm_repository_interface import IAlarmRepository
+from app.services.foresee_glucose_service import ForeseeGlucoseService
 from app.services.interfaces.alarm_service_interface import IAlarmService
 from app.core.ports.clients.glucose_provider_interface import IGlucoseProvider
 from app.core.ports.repositories.glucose_repository_interface import IGlucoseRepository
+from app.services.interfaces.foresee_glucose_service_interface import IForeseeGlucoseService
 from app.services.interfaces.glucose_service_interface import IGlucoseService
 from app.core.ports.repositories.insulin_repository_interface import IInsulinRepository
 from app.services.interfaces.insulin_service_interface import IInsulinService
@@ -38,7 +40,7 @@ _meal_repository_instance = None
 _alarm_service_instance = None
 _alarm_repository_instance = None
 _test_clients_service_instance = None
-
+_foresee_glucose_service_instance = None
 
 
 def get_glucose_provider() -> IGlucoseProvider:
@@ -149,5 +151,11 @@ def get_test_clients_service() -> ITestClientsService:
     if _test_clients_service_instance is None:
         _test_clients_service_instance = TestClientsServiceImpl()
     return _test_clients_service_instance
+
+def get_foresee_glucose_service() -> IForeseeGlucoseService:
+    global _foresee_glucose_service_instance
+    if _foresee_glucose_service_instance is None:
+        _foresee_glucose_service_instance = ForeseeGlucoseService(glucose_repo=get_glucose_repository())
+    return _foresee_glucose_service_instance
 
 

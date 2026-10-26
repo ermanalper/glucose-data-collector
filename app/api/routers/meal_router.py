@@ -10,7 +10,7 @@ from app.services.interfaces.meal_service_interface import IMealService
 router = APIRouter(prefix="/api/v1/meal", tags=["Meal Data"])
 
 @router.post("/add-meal", response_model=bool)
-async def add_meal(
+def add_meal(
         payload: MealRequest,
         user_id: str = Depends(get_current_user_id),
         service: IMealService = Depends(get_meal_service)
@@ -22,7 +22,7 @@ async def add_meal(
     return True
 
 @router.post("/add-meal-shortcut", response_model=bool)
-async def add_meal_shortcut(
+def add_meal_shortcut(
         payload: MealShortcutRequest,
         user_id: str = Depends(get_current_user_id),
         service: IMealService = Depends(get_meal_service)
@@ -33,7 +33,7 @@ async def add_meal_shortcut(
     return True
 
 @router.get("/meal-shortcuts", response_model=List[MealShortcutResponse])
-async def get_meal_shortcuts(
+def get_meal_shortcuts(
         user_id: str = Depends(get_current_user_id),
         service: IMealService = Depends(get_meal_service)
 ):
@@ -47,7 +47,7 @@ async def get_meal_shortcuts(
     ]
 
 @router.get("/history/by-time", response_model=List[MealResponse])
-async def get_meal_history_by_time_interval(
+def get_meal_history_by_time_interval(
         start_time: datetime = Query(..., description="Start time (e.g.: 2026-08-28T10:00:00)"),
         end_time: datetime = Query(default_factory=lambda: datetime.now(timezone.utc),
                                    description="End time (Default: UTC now)"),

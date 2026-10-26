@@ -13,7 +13,7 @@ router = APIRouter(prefix="/api/v1/insulin", tags=["Insulin Data"])
 
 
 @router.post("/add-new-insulin", response_model=bool)
-async def add_new_insulin(
+def add_new_insulin(
         insulin_name: str,
         service: IInsulinService = Depends(get_insulin_service)
 ):
@@ -22,7 +22,7 @@ async def add_new_insulin(
 
 
 @router.post("/enter-insulin-dose", response_model=str)
-async def enter_insulin_dose(
+def enter_insulin_dose(
         payload: InsulinDoseRequest,
         current_user_id: str = Depends(get_current_user_id),
         service: IInsulinService = Depends(get_insulin_service)
@@ -37,7 +37,7 @@ async def enter_insulin_dose(
     return result
 
 @router.get("/history/by-time", response_model=List[InsulinDoseResponse])
-async def get_insulin_dose_history_time_interval(
+def get_insulin_dose_history_time_interval(
             start_time: datetime = Query(..., description="Start time (e.g.: 2026-08-28T10:00:00)"),
             end_time: datetime = Query(default_factory=lambda: datetime.now(timezone.utc),
                                        description="End time (Default: UTC now)"),
@@ -56,7 +56,7 @@ async def get_insulin_dose_history_time_interval(
    ]
 
 @router.get("/insulin-types", response_model=List[InsulinResponse])
-async def get_insulin_types(
+def get_insulin_types(
         service : IInsulinService = Depends(get_insulin_service)
 ):
     insulin_types = service.get_insulin_types()

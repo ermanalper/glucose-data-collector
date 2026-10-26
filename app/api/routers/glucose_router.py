@@ -11,7 +11,7 @@ router = APIRouter(prefix="/api/v1/glucose", tags=["Glucose Data"])
 
 
 @router.get("/latest", response_model=GlucoseResponse)
-async def get_latest_glucose(
+def get_latest_glucose(
         current_user_id: str = Depends(get_current_user_id),
         service: IGlucoseService = Depends(get_glucose_service)
 ):
@@ -26,9 +26,9 @@ async def get_latest_glucose(
 
 
 @router.get("/history", response_model=list[GlucoseResponse])
-async def get_glucose_history_data_count_offset(
+def get_glucose_history_data_count_offset(
         limit: int = Query(default=10, ge=1, le=100, description="Number of latest readings to be fetched"),
-        offset: int = Query(default=0, ge=0, description="Number of latest readiangs to skip"),
+        offset: int = Query(default=0, ge=0, description="Number of latest readings to skip"),
         current_user_id: str = Depends(get_current_user_id),
         service: IGlucoseService = Depends(get_glucose_service)
 ):
@@ -47,7 +47,7 @@ async def get_glucose_history_data_count_offset(
     ]
 
 @router.get("/history/by-time", response_model=list[GlucoseResponse])
-async def get_glucose_history_time_interval(
+def get_glucose_history_time_interval(
         start_time: datetime = Query(..., description="Start time (e.g.: 2026-08-28T10:00:00)"),
         end_time: datetime = Query(default_factory=lambda: datetime.now(timezone.utc), description="End time (Default: UTC now)"),
         current_user_id: str = Depends(get_current_user_id),
@@ -71,7 +71,7 @@ async def get_glucose_history_time_interval(
     ]
 
 @router.get("/first-data-date", response_model=TimestampResponse)
-async def get_first_data_date(
+def get_first_data_date(
         current_user_id: str = Depends(get_current_user_id),
         service: IGlucoseService = Depends(get_glucose_service)):
     first_entry_date = service.get_first_glucose_entry_date(current_user_id)
@@ -79,7 +79,7 @@ async def get_first_data_date(
 
 
 @router.post("/push-client-webhook")
-async def receive_push_client_reading(
+def receive_push_client_reading(
         payload: PushGlucosePayload,
         service: IGlucoseService = Depends(get_glucose_service)
 ):
